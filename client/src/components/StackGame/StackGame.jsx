@@ -281,7 +281,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         />
         {showPerfect && (
           <div className="perfect-prompt">
-            Perfect! <span className="text-yellow-300 font-sans">+2</span>
+            Perfect! <span className="text-yellow-300">+2</span>
           </div>
         )}
       </div>
