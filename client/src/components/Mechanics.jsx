@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import bg from "../assets/bg.jpg"
 
 const Mechanics = ({ setGameState }) => {
   const handleGo = () => {
@@ -7,7 +8,15 @@ const Mechanics = ({ setGameState }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4">
+     <div
+          className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4"
+          style={{
+            backgroundImage: `url(${bg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

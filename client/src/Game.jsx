@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import NameInput from './components/NameInput'
 import Mechanics from './components/Mechanics';
-import StackGame from './components/StackGame';
+import StackGame from './components/StackGame/StackGame';
 import { Result } from './components/Results';
 
 

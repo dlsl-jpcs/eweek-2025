@@ -285,5 +285,3 @@ export const drawCartoonGround = (context, canvas, cameraY) => {
   context.fillStyle = shadowGradient;
   context.fillRect(x, y, width, height * 0.2);
 };
-
-

@@ -8,43 +8,48 @@ export const initGameState = (isMobile) => {
     scrollCounter: 0,
     cameraY: 0,
     current: 1,
-    xSpeed: isMobile ? GAME_CONSTANTS.BASE_SPEED_MOBILE : GAME_CONSTANTS.BASE_SPEED_DESKTOP,
+    xSpeed: isMobile
+      ? GAME_CONSTANTS.BASE_SPEED_MOBILE
+      : GAME_CONSTANTS.BASE_SPEED_DESKTOP,
     gameOverTime: 0,
     boxes: [],
     debris: { x: 0, width: 0, y: 0 },
     isMobile,
-    initialWidth: isMobile 
-      ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE 
-      : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP
+    initialWidth: isMobile
+      ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE
+      : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP,
   };
 };
 
 export const getLeftBoundary = (gameState) => {
-  return gameState.isMobile 
-    ? 0 
+  return gameState.isMobile
+    ? 0
     : (gameState.canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2;
 };
 
 export const getRightBoundary = (gameState) => {
-  return gameState.isMobile 
-    ? gameState.canvas.width 
+  return gameState.isMobile
+    ? gameState.canvas.width
     : (gameState.canvas.width + GAME_CONSTANTS.MAX_GAME_WIDTH) / 2;
 };
 
 export const newBox = (gameState) => {
   const { boxes, current, initialWidth } = gameState;
   const lastBoxTopY = boxes[current - 1].y + GAME_CONSTANTS.BLOCK_HEIGHT;
-  
+
   boxes[current] = {
     x: gameState.isMobile ? 0 : getLeftBoundary(gameState),
-    y: lastBoxTopY + GAME_CONSTANTS.VERTICAL_GAP_BETWEEN_BLOCKS * GAME_CONSTANTS.BLOCK_HEIGHT,
+    y:
+      lastBoxTopY +
+      GAME_CONSTANTS.VERTICAL_GAP_BETWEEN_BLOCKS * GAME_CONSTANTS.BLOCK_HEIGHT,
     width: boxes[current - 1].width,
   };
 
   const speedMultiplier = 1 + (current - 1) * 0.08;
-  gameState.xSpeed = (gameState.isMobile 
-    ? GAME_CONSTANTS.BASE_SPEED_MOBILE 
-    : GAME_CONSTANTS.BASE_SPEED_DESKTOP) * speedMultiplier;
+  gameState.xSpeed =
+    (gameState.isMobile
+      ? GAME_CONSTANTS.BASE_SPEED_MOBILE
+      : GAME_CONSTANTS.BASE_SPEED_DESKTOP) * speedMultiplier;
 };
 
 export const handleBlockLanding = (
@@ -126,8 +131,8 @@ export const restartGame = (gameState) => {
   gameState.mode = "bounce";
   gameState.cameraY = 0;
   gameState.scrollCounter = 0;
-  gameState.xSpeed = gameState.isMobile 
-    ? GAME_CONSTANTS.BASE_SPEED_MOBILE 
+  gameState.xSpeed = gameState.isMobile
+    ? GAME_CONSTANTS.BASE_SPEED_MOBILE
     : GAME_CONSTANTS.BASE_SPEED_DESKTOP;
   gameState.current = 1;
   gameState.debris = { x: 0, width: 0, y: 0 };

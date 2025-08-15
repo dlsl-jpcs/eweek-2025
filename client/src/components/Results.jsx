@@ -1,16 +1,48 @@
 import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import bg from "../assets/bg.jpg";
 
-export const Result = ({playerName, score }) => {
-  const leaderboard = [
-    { rank: 1, name: "Maria", score: 95 },
-    { rank: 2, name: "Makiling", score: 87 },
-    { rank: 3, name: "Alamat", score: 82 },
-    { rank: 4, name: "Shane", score: 79 },
-    { rank: 5, name: "Mikaela", score: 75 },
-  ];
+export const Result = ({ playerName, score }) => {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [playerRank, setPlayerRank] = useState(null);
+  const hasPostedScore = useRef(false);
+
+  useEffect(() => {
+    if (playerName && typeof score === "number" && !hasPostedScore.current) {
+      hasPostedScore.current = true;
+      fetch("http://localhost:5000/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: playerName, score }),
+      }).catch((err) => {
+        console.error("Failed to save score:", err);
+      });
+    }
+
+    fetch("http://localhost:5000/api/leaderboard")
+      .then((res) => res.json())
+      .then((data) => {
+        setLeaderboard(data);
+        const rank = data.findIndex(
+          (entry) => entry.name === playerName && entry.score === score
+        );
+        setPlayerRank(rank !== -1 ? rank + 1 : null);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch leaderboard:", err);
+      });
+  }, [playerName, score]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4">
+    <div
+      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <div className="w-full max-w-lg lg:max-w-md xl:max-w-sm space-y-6">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -36,6 +68,12 @@ export const Result = ({playerName, score }) => {
             >
               <p className="text-2xl lg:text-xl font-bold text-[#5a4a3a]">
                 Your Score: <span className="text-[#fb743f]">{score}</span>
+                {/* rank */}
+                {playerRank && (
+                  <span className="ml-4 text-[#b08968] text-lg">
+                    (Rank: {playerRank})
+                  </span>
+                )}
               </p>
             </motion.div>
           </div>
@@ -60,16 +98,16 @@ export const Result = ({playerName, score }) => {
             <div className="w-full space-y-2">
               {leaderboard.map((player, index) => (
                 <motion.div
-                  key={player.rank}
+                  key={player._id || `${player.name}-${player.score}-${index}`}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
                   className={`flex items-center justify-between p-3 lg:p-2 rounded-xl ${
-                    player.rank === 1
+                    index === 0
                       ? "bg-[#f8e8d8] border-2 border-[#fca94c]"
-                      : player.rank === 2
+                      : index === 1
                       ? "bg-[#f0f0e8] border-2 border-[#b08968]"
-                      : player.rank === 3
+                      : index === 2
                       ? "bg-[#f5e6d3] border-2 border-[#cd7f32]"
                       : "bg-[#fffef6] border-2 border-[#d4a373]"
                   }`}
@@ -77,16 +115,16 @@ export const Result = ({playerName, score }) => {
                   <div className="flex items-center">
                     <div
                       className={`rounded-full w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center mr-3 ${
-                        player.rank === 1
+                        index === 0
                           ? "bg-[#fca94c] text-white"
-                          : player.rank === 2
+                          : index === 1
                           ? "bg-[#b08968] text-white"
-                          : player.rank === 3
+                          : index === 2
                           ? "bg-[#cd7f32] text-white"
                           : "bg-[#d4a373] text-white"
                       }`}
                     >
-                      <span className="font-bold text-sm">{player.rank}</span>
+                      <span className="font-bold text-sm">{index + 1}</span>
                     </div>
                     <span className="text-base lg:text-sm text-[#5a4a3a] font-medium">
                       {player.name}
@@ -94,11 +132,11 @@ export const Result = ({playerName, score }) => {
                   </div>
                   <span
                     className={`text-lg lg:text-base font-bold ${
-                      player.rank === 1
+                      index === 0
                         ? "text-[#fb743f]"
-                        : player.rank === 2
+                        : index === 1
                         ? "text-[#b08968]"
-                        : player.rank === 3
+                        : index === 2
                         ? "text-[#cd7f32]"
                         : "text-[#5a4a3a]"
                     }`}
@@ -118,7 +156,9 @@ export const Result = ({playerName, score }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="rounded-full w-7 h-7 lg:w-6 lg:h-6 bg-[#fb743f] text-white flex items-center justify-center mr-3">
-                    <span className="font-bold text-sm">?</span>
+                    <span className="font-bold text-sm">
+                      {playerRank || "?"}
+                    </span>
                   </div>
                   <span className="text-base lg:text-sm text-[#5a4a3a] font-medium">
                     {playerName}
@@ -131,8 +171,6 @@ export const Result = ({playerName, score }) => {
             </motion.div>
           </div>
         </motion.div>
-
-        
       </div>
     </div>
   );

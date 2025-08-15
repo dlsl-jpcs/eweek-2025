@@ -13,7 +13,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
   useEffect(() => {
     audioRef.current = new Audio(block);
-    audioRef.current.volume = 0.3; 
+    audioRef.current.volume = 0.3;
 
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -26,8 +26,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     let scrollCounter, cameraY, current, mode, xSpeed;
     const ySpeed = 5; // speed of drop
     const height = 55; // height of each block
-    const groundHeight = 50; 
-    const boxes = []; 
+    const groundHeight = 50;
+    const boxes = [];
     let debris = {
       x: 0,
       width: 0,
