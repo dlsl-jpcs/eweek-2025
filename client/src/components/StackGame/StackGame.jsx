@@ -28,6 +28,14 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const audioRef = useRef(null);
   const bonusPointsRef = useRef(0);
 
+  const vibrateOnDrop = () => {
+    
+    if ("vibrate" in navigator) {
+      
+      navigator.vibrate(60);
+    }
+  };
+
   useEffect(() => {
     audioRef.current = new Audio(block);
     audioRef.current.volume = 1;
@@ -202,6 +210,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
           audioRef.current.currentTime = 0;
           audioRef.current.play();
+           vibrateOnDrop();
 
           handleBlockLanding(
             gameState,
