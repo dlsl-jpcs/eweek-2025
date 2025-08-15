@@ -112,13 +112,14 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
       context.fillStyle = textColor;
 
-      context.font = isMobile
-        ? 'bold 55px "Cosmic sans", cursive, sans-serif'
-        : 'bold 30px "Cosmic sans", cursive, sans-serif';
+     context.font = isMobile
+       ? "bold 40px Arial, sans-serif"
+       : "bold 30px Arial, sans-serif";
+
       context.fillText(
         (stackHeight + bonusPointsRef.current).toString(),
         canvas.width / 2,
-        isMobile ? 200 : canvas.height / 6
+        isMobile ? 180 : canvas.height / 6
       );
       context.textAlign = "left";
 
