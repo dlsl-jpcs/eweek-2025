@@ -17,7 +17,7 @@ export const gameStyles = `
     left: 50%;
     text-align: center;
     transform: translate(-50%, -50%);
-    font-size: 48px;
+    font-size: 35px;
     font-weight: bold;
     color: #fff;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);

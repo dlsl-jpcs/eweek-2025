@@ -68,7 +68,7 @@ export const Result = ({ playerName, score }) => {
             >
               <p className="text-2xl lg:text-xl font-bold text-[#5a4a3a]">
                 Your Score:{" "}
-                <span className="text-[#fb743f] font-sans">{score}</span>
+                <span className="text-[#fb743f] font-sora">{score}</span>
                 {/* rank */}
                 {playerRank && (
                   <span className="ml-4 text-[#b08968] text-lg">
@@ -132,7 +132,7 @@ export const Result = ({ playerName, score }) => {
                     </span>
                   </div>
                   <span
-                    className={`text-lg lg:text-base font-bold font-sans ${
+                    className={`text-lg lg:text-base font-bold font-sora ${
                       index === 0
                         ? "text-[#fb743f]"
                         : index === 1
@@ -165,7 +165,7 @@ export const Result = ({ playerName, score }) => {
                     {playerName}
                   </span>
                 </div>
-                <span className="text-lg lg:text-base font-bold font-sans text-[#fb743f]">
+                <span className="text-lg lg:text-base font-bold font-sora text-[#fb743f]">
                   {score}
                 </span>
               </div>
