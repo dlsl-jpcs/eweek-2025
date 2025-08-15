@@ -215,7 +215,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
       gameState.debris.y = gameState.debris.y - GAME_CONSTANTS.Y_SPEED;
       if (gameState.scrollCounter) {
-        gameState.cameraY++;
+        gameState.cameraY += GAME_CONSTANTS.CAMERA_SPEED;
         gameState.scrollCounter--;
       }
 
