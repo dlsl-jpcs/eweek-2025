@@ -5,6 +5,7 @@ import {
   initGameState,
   getLeftBoundary,
   getRightBoundary,
+  newBox,
   handleBlockLanding,
   restartGame,
 } from "./gameUtils";
@@ -22,6 +23,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [showPerfect, setShowPerfect] = useState(false);
   const [perfectTimeout, setPerfectTimeout] = useState(null);
+  const [bonusPoints, setBonusPoints] = useState(0);
   const gameStateRef = useRef(null);
   const audioRef = useRef(null);
   const bonusPointsRef = useRef(0);
@@ -30,41 +32,20 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     audioRef.current = new Audio(block);
     audioRef.current.volume = 1;
 
-    const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
     checkIfMobile();
     window.addEventListener("resize", checkIfMobile);
 
     let animationFrameId;
-
-    const resizeCanvas = () => {
-      const canvas = canvasRef.current;
-      const dpr = isMobile ? 1.5 : Math.min(window.devicePixelRatio, 2); // cap DPR for performance
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(1, 0, 0, 1, 0, 0); // reset any scaling
-      ctx.scale(dpr, dpr);
-
-      if (gameStateRef.current?.boxes.length > 0) {
-        const initialX = isMobile
-          ? window.innerWidth / 2 - gameStateRef.current.initialWidth / 2
-          : Math.max(
-              window.innerWidth / 2 - gameStateRef.current.initialWidth / 2,
-              (window.innerWidth - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
-            );
-        gameStateRef.current.boxes[0].x = initialX;
-        gameStateRef.current.boxes[0].width = gameStateRef.current.initialWidth;
-      }
-    };
 
     const initGame = () => {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
 
       resizeCanvas();
+
       context.font = 'bold 30px "Cosmic sans", cursive, sans-serif';
 
       gameStateRef.current = initGameState(isMobile);
@@ -72,10 +53,10 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       gameStateRef.current.context = context;
 
       const initialX = isMobile
-        ? window.innerWidth / 2 - gameStateRef.current.initialWidth / 2
+        ? canvas.width / 2 - gameStateRef.current.initialWidth / 2
         : Math.max(
-            window.innerWidth / 2 - gameStateRef.current.initialWidth / 2,
-            (window.innerWidth - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
+            canvas.width / 2 - gameStateRef.current.initialWidth / 2,
+            (canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
           );
 
       gameStateRef.current.boxes[0] = {
@@ -88,20 +69,34 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       animate();
     };
 
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      if (gameStateRef.current?.boxes.length > 0) {
+        const initialX = isMobile
+          ? canvas.width / 2 - gameStateRef.current.initialWidth / 2
+          : Math.max(
+              canvas.width / 2 - gameStateRef.current.initialWidth / 2,
+              (canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
+            );
+        gameStateRef.current.boxes[0].x = initialX;
+        gameStateRef.current.boxes[0].width = gameStateRef.current.initialWidth;
+      }
+    };
+
     const animate = () => {
       const gameState = gameStateRef.current;
       const { context, canvas } = gameState;
 
-      // Clear only visible area instead of full pixel size
-      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
+      context.clearRect(0, 0, canvas.width, canvas.height);
       const stackHeight = gameState.current - 1;
 
       drawSky(context, canvas, stackHeight);
-      drawStars(context, canvas, stackHeight, isMobile ? 20 : 50); // reduce star count for mobile
+      drawStars(context, canvas, stackHeight);
       drawCartoonGround(context, canvas, gameState.cameraY);
 
-      // Draw score
       context.textAlign = "center";
       let textColor;
       if (stackHeight < GAME_CONSTANTS.SUNSET_THRESHOLD) {
@@ -116,18 +111,19 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         textColor = "#ffffff";
       }
       context.fillStyle = textColor;
-      context.font = isMobile ? "bold 55px sans-serif" : "bold 30px sans-serif";
+
+      context.font = isMobile ? "bold 55px " : "bold 30px ";
       context.fillText(
         (stackHeight + bonusPointsRef.current).toString(),
-        window.innerWidth / 2,
-        isMobile ? 80 : window.innerHeight / 6
+        canvas.width / 2,
+        isMobile ? 200 : canvas.height / 6
       );
+      context.textAlign = "left";
 
-      // Draw blocks
       for (let n = 0; n < gameState.boxes.length; n++) {
         const box = gameState.boxes[n];
         const yScreenTop =
-          window.innerHeight -
+          canvas.height -
           GAME_CONSTANTS.GROUND_HEIGHT -
           (box.y + GAME_CONSTANTS.BLOCK_HEIGHT) +
           gameState.cameraY;
@@ -140,10 +136,9 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         );
       }
 
-      // Draw debris
-      if (gameState.debris.width !== 0) {
+      if (gameState.debris.width != 0) {
         const debrisYScreenTop =
-          window.innerHeight -
+          canvas.height -
           GAME_CONSTANTS.GROUND_HEIGHT -
           (gameState.debris.y + GAME_CONSTANTS.BLOCK_HEIGHT) +
           gameState.cameraY;
@@ -156,7 +151,6 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         );
       }
 
-      // Game state handling
       if (gameState.mode === "gameOver") {
         if (Date.now() - gameState.gameOverTime > 300) {
           setScore(gameState.current - 1 + bonusPointsRef.current);
@@ -167,7 +161,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
 
       if (gameState.mode === "bounce") {
-        gameState.boxes[gameState.current].x += gameState.xSpeed;
+        gameState.boxes[gameState.current].x =
+          gameState.boxes[gameState.current].x + gameState.xSpeed;
         const rightBoundary = getRightBoundary(gameState);
         const leftBoundary = getLeftBoundary(gameState);
 
@@ -191,7 +186,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
 
       if (gameState.mode === "fall") {
-        gameState.boxes[gameState.current].y -= GAME_CONSTANTS.Y_SPEED;
+        gameState.boxes[gameState.current].y =
+          gameState.boxes[gameState.current].y - GAME_CONSTANTS.Y_SPEED;
         if (
           gameState.boxes[gameState.current].y <=
           gameState.boxes[gameState.current - 1].y + GAME_CONSTANTS.BLOCK_HEIGHT
@@ -206,7 +202,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
           handleBlockLanding(
             gameState,
-            () => {},
+            setBonusPoints,
             setShowPerfect,
             setPerfectTimeout,
             bonusPointsRef
@@ -214,7 +210,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         }
       }
 
-      gameState.debris.y -= GAME_CONSTANTS.Y_SPEED;
+      gameState.debris.y = gameState.debris.y - GAME_CONSTANTS.Y_SPEED;
       if (gameState.scrollCounter) {
         gameState.cameraY++;
         gameState.scrollCounter--;
@@ -224,19 +220,28 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     };
 
     const handlePointerDown = () => {
-      if (gameStateRef.current.mode === "bounce") {
-        gameStateRef.current.mode = "fall";
+      if (gameStateRef.current.mode === "gameOver") {
+        // restart();
+      } else {
+        if (gameStateRef.current.mode === "bounce")
+          gameStateRef.current.mode = "fall";
       }
     };
 
     const handleKeyDown = (e) => {
-      if (e.code === "Space" && gameStateRef.current.mode === "bounce") {
+      if (e.code === "Space") {
         e.preventDefault();
-        gameStateRef.current.mode = "fall";
+        if (gameStateRef.current.mode === "gameOver") {
+          // restart();
+        } else {
+          if (gameStateRef.current.mode === "bounce")
+            gameStateRef.current.mode = "fall";
+        }
       }
     };
 
     initGame();
+
     window.addEventListener("resize", resizeCanvas);
     canvasRef.current.addEventListener("pointerdown", handlePointerDown);
     window.addEventListener("keydown", handleKeyDown);
@@ -252,18 +257,24 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
-      if (perfectTimeout) clearTimeout(perfectTimeout);
+      if (perfectTimeout) {
+        clearTimeout(perfectTimeout);
+      }
     };
   }, [isMobile]);
 
   return (
     <>
-      <style>{gameStyles}</style>
+      <div>
+        <style>{gameStyles}</style>
+      </div>
       <div className="game-container">
         <canvas
           ref={canvasRef}
           id="gameCanvas"
-          style={{ touchAction: "none" }}
+          style={{
+            touchAction: "none",
+          }}
         />
         {showPerfect && (
           <div className="perfect-prompt">
