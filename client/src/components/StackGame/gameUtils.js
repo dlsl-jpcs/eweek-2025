@@ -57,7 +57,8 @@ export const handleBlockLanding = (
   setBonusPoints,
   setShowPerfect,
   setPerfectTimeout,
-  bonusPointsRef // Add this parameter
+  bonusPointsRef,
+  
 ) => {
   const { boxes, current } = gameState;
   const currentBox = boxes[current];
@@ -86,9 +87,9 @@ export const handleBlockLanding = (
     currentBox.width = previousBox.width;
     gameState.debris = { x: 0, width: 0, y: 0 };
 
-    bonusPointsRef.current += 1; // Update the ref
-    setBonusPoints(bonusPointsRef.current); // Update state
-    gameState.bonusPoints = bonusPointsRef.current; // Sync with gameState
+    bonusPointsRef.current += 1;
+    setBonusPoints(bonusPointsRef.current);
+    gameState.bonusPoints = bonusPointsRef.current;
 
     setShowPerfect(true);
     setPerfectTimeout(

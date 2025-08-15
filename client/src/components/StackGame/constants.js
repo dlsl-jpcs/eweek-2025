@@ -1,6 +1,6 @@
 export const GAME_CONSTANTS = {
   // Game mechanics
-  Y_SPEED: 10,
+  Y_SPEED: 12,
   BLOCK_HEIGHT: 45,
   GROUND_HEIGHT: 50,
   CAMERA_THRESHOLD: 5,

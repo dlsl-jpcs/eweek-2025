@@ -1,13 +1,28 @@
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import bg from "../assets/bg.jpg";
+import over from "/gameover.mp3";
 
 export const Result = ({ playerName, score }) => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [playerRank, setPlayerRank] = useState(null);
   const hasPostedScore = useRef(false);
+   const audioRef = useRef(null);
 
   useEffect(() => {
+     audioRef.current = new Audio(over);
+
+     // Try to play audio
+     const playAudio = async () => {
+       try {
+         await audioRef.current.play();
+       } catch (err) {
+         console.log("Audio play failed:", err);
+       }
+     };
+
+     playAudio();
+
     if (playerName && typeof score === "number" && !hasPostedScore.current) {
       hasPostedScore.current = true;
       fetch("http://localhost:5000/api/scores", {
@@ -31,6 +46,12 @@ export const Result = ({ playerName, score }) => {
       .catch((err) => {
         console.error("Failed to fetch leaderboard:", err);
       });
+  return () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
   }, [playerName, score]);
 
   return (

@@ -28,6 +28,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const audioRef = useRef(null);
   const bonusPointsRef = useRef(0);
 
+
   const vibrateOnDrop = () => {
     
     if ("vibrate" in navigator) {
@@ -36,9 +37,12 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     }
   };
 
+  
+
   useEffect(() => {
     audioRef.current = new Audio(block);
     audioRef.current.volume = 1;
+
 
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -163,7 +167,10 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
 
       if (gameState.mode === "gameOver") {
-        if (Date.now() - gameState.gameOverTime > 300) {
+        if (Date.now() - gameState.gameOverTime > 100) {
+          
+      
+
           setScore(gameState.current - 1 + bonusPointsRef.current);
           setGameState("results");
         }
@@ -217,7 +224,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
             setBonusPoints,
             setShowPerfect,
             setPerfectTimeout,
-            bonusPointsRef
+            bonusPointsRef,
+       
           );
         }
       }
@@ -269,6 +277,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
+   
       if (perfectTimeout) {
         clearTimeout(perfectTimeout);
       }
