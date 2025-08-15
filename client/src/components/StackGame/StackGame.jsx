@@ -112,7 +112,9 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
       context.fillStyle = textColor;
 
-      context.font = isMobile ? "bold 55px " : "bold 30px ";
+      context.font = isMobile
+        ? 'bold 55px "Cosmic sans", cursive, sans-serif'
+        : 'bold 30px "Cosmic sans", cursive, sans-serif';
       context.fillText(
         (stackHeight + bonusPointsRef.current).toString(),
         canvas.width / 2,
@@ -278,7 +280,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         />
         {showPerfect && (
           <div className="perfect-prompt">
-            Perfect! <span className="text-yellow-300">+2</span>
+            Perfect! <span className="text-yellow-300 font-sans">+2</span>
           </div>
         )}
       </div>

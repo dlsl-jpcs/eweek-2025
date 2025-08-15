@@ -29,7 +29,7 @@ const NameInput = ({ playerName, setPlayerName, setGameState }) => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="w-full max-w-[260px] px-5 py-3 mb-6 text-2xl rounded-2xl border-2 border-[#c4a484] focus:outline-none focus:ring-2 focus:ring-[#7a5e42] text-[#4a3f2a] font-medium text-center bg-[#f9f6f0] placeholder-[#9f7e63] shadow-sm"
+            className="w-full max-w-[260px] font-sans px-5 py-3 mb-6 text-2xl rounded-2xl border-2 border-[#c4a484] focus:outline-none focus:ring-2 focus:ring-[#7a5e42] text-[#4a3f2a] font-medium text-center bg-[#f9f6f0] placeholder-[#9f7e63] shadow-sm"
             placeholder="Name"
           />
           <button
