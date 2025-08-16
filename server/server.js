@@ -21,15 +21,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  // MongoDB 4.0+ doesn't need these options
 })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
 app.use(express.json());
-
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Simple game access control - no session management needed
 // The game is accessible via the deployed URL, but requires admin approval to play
@@ -377,10 +374,6 @@ app.get('/api/student-status/:studentId/:sessionId', async (req, res) => {
 });
 
 
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
