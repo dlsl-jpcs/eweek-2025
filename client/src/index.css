@@ -1,8 +1,10 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: 'Cweyons';
-  src: url('/src/assets/font/Cweyons-Regular.ttf') format('truetype');
+  src: url('./assets/font/Cweyons-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
