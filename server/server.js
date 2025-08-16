@@ -242,6 +242,11 @@ app.post('/api/username', async (req, res) => {
       '2022336004': { email: 'drexler_reyes@dlsl.edu.ph' }
     };
 
+    // Make sure studentId is available in this scope
+    if (!studentId) {
+      return res.status(400).json({ error: 'Student ID is required' });
+    }
+
     const studentInfo = fallbackData[studentId];
      
     if (!studentInfo) {

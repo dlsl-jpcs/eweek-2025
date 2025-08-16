@@ -2,8 +2,8 @@ const axios = require('axios');
 const https = require('https');
 
 async function fetchStudentInfo(studentId) {
-  const apiUrl = process.env.PORTAL_BASE_URL + "/registration/event/helper.php";
-  const regKey = process.env.REG_KEY || "20250515U60HB0";
+  const apiUrl = process.env.DLSL_API_URL + "/registration/event/helper.php";
+  const regKey = process.env.DLSL_REG_KEY || "20250515U60HB0";
   
   console.log('Making request to DLSL API:', apiUrl);
   console.log('Student ID:', studentId);
