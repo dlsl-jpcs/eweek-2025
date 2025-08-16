@@ -21,10 +21,11 @@ async function fetchStudentInfo(studentId) {
     'Accept': 'application/json, text/plain, */*',
   };
 
-  let httpsAgent;
-  if (process.env.INSECURE_TLS === 'true') {
-    httpsAgent = new https.Agent({ rejectUnauthorized: false });
-  }
+  // Always use insecure TLS for DLSL API due to SSL certificate issues
+  const httpsAgent = new https.Agent({ 
+    rejectUnauthorized: false,
+    secureProtocol: 'TLS_method'
+  });
 
   try {
     console.log('Sending form data:', formData.toString());

@@ -231,38 +231,7 @@ app.post('/api/username', async (req, res) => {
     });
   } catch (error) {
     console.error('Error in student lookup:', error);
-     
-    // Fallback to mock data if DLSL API is unavailable
-    console.log('DLSL API unavailable, using fallback data for testing');
-     
-    const fallbackData = {
-      '2022336001': { email: 'john_doe_smith@dlsl.edu.ph' },
-      '2022336002': { email: 'jane_marie_garcia@dlsl.edu.ph' },
-      '2022336003': { email: 'michael_james_rodriguez@dlsl.edu.ph' },
-      '2022336004': { email: 'drexler_reyes@dlsl.edu.ph' }
-    };
-
-    // Make sure studentId is available in this scope
-    if (!studentId) {
-      return res.status(400).json({ error: 'Student ID is required' });
-    }
-
-    const studentInfo = fallbackData[studentId];
-     
-    if (!studentInfo) {
-      return res.status(404).json({ error: 'Student information not found' });
-    }
-
-    const { email } = studentInfo;
-    const username = deriveUsername(email, strategy || process.env.USERNAME_STRATEGY || 'dot');
-    const displayName = deriveDisplayName(email);
-     
-    return res.json({ 
-      studentId, 
-      email, 
-      username, 
-      displayName
-    });
+    res.status(500).json({ error: 'Failed to fetch student information from DLSL API' });
   }
 });
 
