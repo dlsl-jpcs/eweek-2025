@@ -347,7 +347,14 @@ app.get('/api/student-status/:studentId/:sessionId', async (req, res) => {
   }
 });
 
-
+// Catch-all route for client-side routing
+// This must be AFTER all your API routes
+app.get('*', (req, res) => {
+  // Only serve frontend for non-API routes
+  if (!req.path.startsWith('/api/')) {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
