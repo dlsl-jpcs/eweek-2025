@@ -1,23 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production'
   
   return {
-    plugins: [
-      react(),
-      viteStaticCopy({
-        targets: [
-          {
-            src: '_redirects',
-            dest: './'
-          }
-        ]
-      })
-    ],
+    plugins: [react()],
     server: {
       proxy: {
         '/api': {
@@ -42,11 +31,7 @@ export default defineConfig(({ command, mode }) => {
             vendor: ['react', 'react-dom', 'react-router-dom']
           }
         }
-      },
-      // Copy _redirects to the root of the dist directory
-      copyPublicDir: true,
-      // Ensure _redirects is included in the build
-      assetsInclude: ['**/*.txt', '**/*.html', '**/_redirects']
+      }
     },
     define: {
       'process.env': {}
