@@ -14,5 +14,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          game: ['framer-motion']
+        }
+      }
+    }
   },
+  define: {
+    // Ensure environment variables are available
+    'process.env': {}
+  }
 })

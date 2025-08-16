@@ -3,8 +3,8 @@ const getBaseUrl = () => {
   if (import.meta.env.DEV) {
     return 'http://localhost:5000';
   }
-  // In production, use the current domain
-  return window.location.origin;
+  // In production, use the deployed backend URL from environment variable
+  return import.meta.env.VITE_BACKEND_URL || 'https://jpcs-booth-game-backend.onrender.com';
 };
 
 const baseUrl = getBaseUrl();

@@ -1,0 +1,30 @@
+services:
+  # Backend API Service
+  - type: web
+    name: jpcs-booth-game-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    rootDir: server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: DLSL_REG_KEY
+        sync: false
+      - key: PORT
+        value: 10000
+
+  # Frontend Static Site
+  - type: web
+    name: jpcs-booth-game-frontend
+    env: static
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    rootDir: client
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://jpcs-booth-game-backend.onrender.com

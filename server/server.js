@@ -9,7 +9,16 @@ const cors = require('cors');
 const { fetchStudentInfo } = require('./portalClient');
 const { deriveUsername, deriveDisplayName } = require('./username');
 
-app.use(cors());
+// CORS configuration for production deployment
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://jpcs-booth-game-frontend.onrender.com', 'http://localhost:3000']
+    : true,
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
