@@ -25,19 +25,10 @@ services:
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
     rootDir: client
-    # Important: This ensures all routes are handled by index.html
+    # Simple catch-all rewrite for SPA routing
     routes:
       - type: rewrite
         source: "/*"
-        destination: "/index.html"
-        # This ensures static files are still served directly
-        has:
-          type: header
-          key: accept
-          value: "^text/html"
-      # Serve static files directly
-      - type: file
-        source: "/**/*.*"
         destination: "/index.html"
     envVars:
       - key: VITE_BACKEND_URL
