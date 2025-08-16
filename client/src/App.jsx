@@ -5,8 +5,9 @@ import Admin from './Admin'
 import "./index.css";
 
 function App() {
+  // For Render deployment, we don't need a basename
   return (
-    <Router basename={import.meta.env.PROD ? '' : '/'}>
+    <Router>
       <Routes>
         <Route path="/admin" element={<Admin />} />
         <Route path="/" element={
