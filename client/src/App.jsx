@@ -14,6 +14,12 @@ function App() {
             <Game />
           </div>
         } />
+        {/* Catch-all route for SPA routing */}
+        <Route path="*" element={
+          <div className='bg-green-200 w-full h-[100dvh]'>
+            <Game />
+          </div>
+        } />
       </Routes>
     </Router>
   );
