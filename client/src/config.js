@@ -1,20 +1,17 @@
 // Configuration for different environments
-const config = {
-  development: {
-    dlslApiUrl: 'http://localhost:5000', // Same as game server
-    gameApiUrl: 'http://localhost:5000'
-  },
-  production: {
-    dlslApiUrl: 'https://your-game-render-url.onrender.com', // Same as game server
-    gameApiUrl: 'https://your-game-render-url.onrender.com'
+const getBaseUrl = () => {
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000';
   }
+  // In production, use the current domain
+  return window.location.origin;
 };
 
-// Get current environment
-const env = import.meta.env.MODE || 'development';
+const baseUrl = getBaseUrl();
 
-// Export the appropriate config
-export const { dlslApiUrl, gameApiUrl } = config[env];
+// Export the configuration
+export const dlslApiUrl = baseUrl;
+export const gameApiUrl = baseUrl;
 
 // Helper function to get the full API URL
 export const getDlslApiUrl = (endpoint) => `${dlslApiUrl}${endpoint}`;
