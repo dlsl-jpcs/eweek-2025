@@ -6,7 +6,7 @@ import "./index.css";
 
 function App() {
   return (
-    <Router basename="/">
+    <Router basename={import.meta.env.PROD ? '' : '/'}>
       <Routes>
         <Route path="/admin" element={<Admin />} />
         <Route path="/" element={
