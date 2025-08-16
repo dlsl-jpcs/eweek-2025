@@ -33,6 +33,12 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    // This ensures the static server serves index.html for all routes in production
+    preview: {
+      port: 3000,
+      strictPort: true,
+      historyApiFallback: true
+    },
     define: {
       'process.env': {}
     }

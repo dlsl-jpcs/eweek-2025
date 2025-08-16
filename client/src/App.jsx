@@ -1,12 +1,12 @@
 // Updated client/src/App.jsx
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Game from './Game'
 import Admin from './Admin'
 import "./index.css";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <Routes>
         <Route path="/admin" element={<Admin />} />
         <Route path="/" element={
@@ -21,4 +21,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
