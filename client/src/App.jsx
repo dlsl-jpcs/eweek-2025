@@ -1,11 +1,10 @@
 // Updated client/src/App.jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Game from './Game'
 import Admin from './Admin'
 import "./index.css";
 
 function App() {
-  // For Render deployment, we don't need a basename
   return (
     <Router>
       <Routes>
