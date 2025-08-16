@@ -11,6 +11,7 @@ export default defineConfig({
       },
     },
   },
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -23,7 +24,6 @@ export default defineConfig({
     }
   },
   define: {
-    // Ensure environment variables are available
     'process.env': {}
   }
 })
