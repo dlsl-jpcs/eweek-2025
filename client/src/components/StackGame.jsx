@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import block from "/block2.mp3";
 
-const StackGame = ({ name, score, setScore, setGameState }) => {
+const StackGame = ({ name, score, setScore, setGameState, attempts, maxAttempts }) => {
   const canvasRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [gameOver, setGameOver] = useState(false);

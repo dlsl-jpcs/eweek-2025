@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const Mechanics = ({ setGameState }) => {
+const Mechanics = ({ setGameState, attempts, maxAttempts }) => {
   const handleGo = () => {
     setGameState("stackGame");
   };

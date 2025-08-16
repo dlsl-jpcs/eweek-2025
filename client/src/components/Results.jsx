@@ -1,36 +1,21 @@
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 
-export const Result = ({ playerName, score }) => {
-  const [leaderboard, setLeaderboard] = useState([]);
+export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, onPlayAgain }) => {
   const [playerRank, setPlayerRank] = useState(null);
   const hasPostedScore = useRef(false);
 
   useEffect(() => {
-    if (playerName && typeof score === "number" && !hasPostedScore.current) {
-      hasPostedScore.current = true;
-      fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: playerName, score }),
-      }).catch((err) => {
-        console.error("Failed to save score:", err);
-      });
+    if (leaderboard && playerName && typeof score === "number") {
+      const rank = leaderboard.findIndex(
+        (entry) => entry.name === playerName && entry.bestScore === score
+      );
+      setPlayerRank(rank !== -1 ? rank + 1 : null);
     }
-    
-    fetch("/api/leaderboard")
-      .then((res) => res.json())
-      .then((data) => {
-        setLeaderboard(data);
-        const rank = data.findIndex(
-          (entry) => entry.name === playerName && entry.score === score
-        );
-        setPlayerRank(rank !== -1 ? rank + 1 : null);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch leaderboard:", err);
-      });
-  }, [playerName, score]);
+  }, [leaderboard, playerName, score]);
+
+  // Note: onPlayAgain function is kept for future use but not displayed
+  const canPlayAgain = attempts < maxAttempts;
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4">
@@ -65,6 +50,47 @@ export const Result = ({ playerName, score }) => {
                 )} 
               </p>
             </motion.div>
+
+            {/* Session Complete Message */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mt-4 p-4 bg-[#f0f9ff] border-2 border-[#0ea5e9] rounded-xl"
+            >
+              <p className="text-[#0369a1] text-center font-medium">
+                Session Complete! Scan the QR code again to play more.
+              </p>
+            </motion.div>
+
+            {/* Note: Retry functionality is disabled but code is preserved for future use */}
+            {/* 
+            {canPlayAgain && (
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                onClick={onPlayAgain}
+                className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-[#fca94c] to-[#fb743f] rounded-xl shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-150"
+              >
+                Play Again
+              </motion.button>
+            )}
+
+            {!canPlayAgain && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-4 p-4 bg-[#fef2f2] border-2 border-[#fca5a5] rounded-xl"
+              >
+                <p className="text-[#dc2626] text-center font-medium">
+                  You've used all {maxAttempts} attempts for this session. 
+                  Scan the QR code again to play more!
+                </p>
+              </motion.div>
+            )}
+            */}
           </div>
         </motion.div>
 
@@ -87,7 +113,7 @@ export const Result = ({ playerName, score }) => {
             <div className="w-full space-y-2">
               {leaderboard.map((player, index) => (
                 <motion.div
-                  key={player._id || `${player.name}-${player.score}-${index}`}
+                  key={player._id || `${player.name}-${player.bestScore}-${index}`}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
@@ -130,7 +156,7 @@ export const Result = ({ playerName, score }) => {
                         : "text-[#5a4a3a]"
                     }`}
                   >
-                    {player.score}
+                    {player.bestScore}
                   </span>
                 </motion.div>
               ))}
