@@ -56,10 +56,6 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
               transition={{ delay: 0.6 }}
               className="mt-4 p-4 bg-[#f0f9ff] border-2 border-[#0ea5e9] rounded-xl"
             >
-              <p className="text-[#0369a1] text-center font-medium">
-                Session Complete! Scan the QR code again to play more. 
-                {/* ano ipapalit dito hwjhsaajassa shane ikaw na */}
-              </p>
             </motion.div>
 
             {/* Note: Retry functionality is disabled but code is preserved for future use  NOTE: NI-ENABLE Q NA*/}

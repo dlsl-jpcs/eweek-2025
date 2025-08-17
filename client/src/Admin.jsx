@@ -10,8 +10,9 @@ const Admin = () => {
   });
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState('');
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const staffPassword = password;
 
@@ -39,7 +40,9 @@ const Admin = () => {
   const fetchPending = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      setLoading(true);
+      if (isInitialLoad) {
+        setLoading(true);
+      }
       const url = getGameApiUrl(`/api/approval/pending?staffPassword=${encodeURIComponent(staffPassword || '')}`);
       const res = await fetch(url);
       if (!res.ok) {
@@ -47,21 +50,37 @@ const Admin = () => {
         throw new Error(data.error || `Failed to load pending requests (${res.status})`);
       }
       const data = await res.json();
-      setPending(Array.isArray(data) ? data : []);
+      setPending(prevPending => {
+        // Only update if we have new data
+        if (JSON.stringify(prevPending) !== JSON.stringify(data)) {
+          return Array.isArray(data) ? data : [];
+        }
+        return prevPending;
+      });
       setError('');
     } catch (err) {
       setError(err.message || 'Unable to load pending requests');
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+        setIsInitialLoad(false);
+      }
     }
   }, [isAuthenticated, staffPassword]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
+    
+    // Initial fetch
     fetchPending();
-    const id = setInterval(fetchPending, 2000);
+    
+    // Set up refresh interval
+    const id = setInterval(() => {
+      fetchPending();
+    }, 2000);
+    
     return () => clearInterval(id);
-  }, [isAuthenticated, fetchPending]);
+  }, [isAuthenticated, fetchPending, isInitialLoad]);
 
   const approve = async (requestId) => {
     try {
@@ -166,18 +185,6 @@ const Admin = () => {
           <h3 className="text-2xl font-semibold text-green-800 mt-6 mb-2">Admin Dashboard</h3>
           
           <div className="flex justify-center space-x-4 mb-6">
-            <Link 
-              to="/admin" 
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              Pending Approvals
-            </Link>
-            <Link 
-              to="/leaderboard" 
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              View Leaderboard
-            </Link>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"

@@ -60,10 +60,6 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
           <h1 className="text-[#4a3f2a] text-4xl font-bold mb-6 text-center drop-shadow-sm">
             Enter your Student Number
           </h1>
-          <p className="text-[#6b5b47] text-lg mb-6 text-center">
-            We'll fetch your name from the DLSL database
-            {/* palitan din siguro toh */}
-          </p>
           
           <input
             type="text"
