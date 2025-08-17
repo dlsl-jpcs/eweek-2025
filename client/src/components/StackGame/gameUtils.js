@@ -7,13 +7,13 @@ const calculateInitialWidth = (canvas) => {
     : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP;
 
  
-  const scaleFactor = Math.min(canvas.width / (isMobile ? 400 : 1200), 1.5);
-  const scaledWidth = baseWidth * scaleFactor;
+  const scaleFactor = Math.min(canvas.width / (isMobile ? 400 : 1200), 1.2);
+  const scaledWidth = baseWidth * scaleFactor * 0.8;
 
   // Ensure width doesn't exceed game boundaries
   const maxWidth = isMobile
-    ? canvas.width * 0.8
-    : Math.min(GAME_CONSTANTS.MAX_GAME_WIDTH * 0.6, canvas.width * 0.4);
+    ? canvas.width * 0.6
+    : Math.min(GAME_CONSTANTS.MAX_GAME_WIDTH * 0.5, canvas.width * 0.3);
 
   return Math.min(scaledWidth, maxWidth); 
 };
