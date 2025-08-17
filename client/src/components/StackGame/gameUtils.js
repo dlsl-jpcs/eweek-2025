@@ -6,15 +6,16 @@ const calculateInitialWidth = (canvas) => {
     ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE
     : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP;
 
+ 
   const scaleFactor = Math.min(canvas.width / (isMobile ? 400 : 1200), 1.5);
   const scaledWidth = baseWidth * scaleFactor;
 
-  // ensure width doesn't exceed game boundaries
+  // Ensure width doesn't exceed game boundaries
   const maxWidth = isMobile
     ? canvas.width * 0.8
     : Math.min(GAME_CONSTANTS.MAX_GAME_WIDTH * 0.6, canvas.width * 0.4);
 
-  return Math.max(150, Math.min(scaledWidth, maxWidth)); // Min 150px, respect max
+  return Math.min(scaledWidth, maxWidth); 
 };
 
 export const initGameState = (isMobile, canvas = null) => {
@@ -147,19 +148,23 @@ export const handleBlockLanding = (
   newBox(gameState);
 };
 
-// function to update responsive dimensions on resize
+
 export const updateResponsiveDimensions = (gameState) => {
   const { canvas } = gameState;
   const newIsMobile = canvas.width <= 768;
 
+
   gameState.isMobile = newIsMobile;
+
 
   const newInitialWidth = calculateInitialWidth(canvas);
   gameState.initialWidth = newInitialWidth;
 
+
   if (gameState.boxes.length > 0 && gameState.current === 1) {
     gameState.boxes[0].width = newInitialWidth;
   }
+
 
   const speedMultiplier = 1 + (gameState.current - 1) * 0.08;
   gameState.xSpeed =
@@ -181,7 +186,7 @@ export const restartGame = (gameState) => {
   gameState.gameOverTime = 0;
   gameState.bonusPoints = 0;
 
-  // use responsive initial width
+
   const responsiveInitialWidth = calculateInitialWidth(gameState.canvas);
   gameState.initialWidth = responsiveInitialWidth;
 
