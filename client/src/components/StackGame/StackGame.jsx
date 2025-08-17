@@ -152,7 +152,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       context.fillText(
         (stackHeight + bonusPointsRef.current).toString(),
         canvas.width / 2,
-        isMobile ? 150 : canvas.height / 6
+        isMobile ? 120 : canvas.height / 6
       );
       context.textAlign = "left";
 
