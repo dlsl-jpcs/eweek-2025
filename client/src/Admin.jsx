@@ -9,6 +9,7 @@ const Admin = () => {
   });
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
   // Removed loading animations and intervals; keep UI static
 
   const staffPassword = password;
@@ -47,7 +48,12 @@ const Admin = () => {
         throw new Error(data.error || `Failed to load pending requests (${res.status})`);
       }
       const data = await res.json();
-      setPending(Array.isArray(data) ? data : []);
+      // Only update state if data actually changed to avoid UI flicker during polling
+      setPending(prev => {
+        const incoming = Array.isArray(data) ? data : [];
+        return JSON.stringify(prev) !== JSON.stringify(incoming) ? incoming : prev;
+      });
+      setLastUpdated(Date.now());
       setError('');
     } catch (err) {
       setError(err.message || 'Unable to load pending requests');
@@ -56,8 +62,10 @@ const Admin = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    // Initial fetch only. No auto-refresh to avoid UI flicker.
+    // Initial fetch and background polling without any loading animations
     fetchPending();
+    const id = setInterval(fetchPending, 3000);
+    return () => clearInterval(id);
   }, [isAuthenticated, fetchPending]);
 
   const approve = async (requestId) => {
@@ -274,7 +282,7 @@ const Admin = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Last Updated</span>
                     <span className="text-sm text-gray-500">
-                      {new Date().toLocaleTimeString()}
+                      {lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : '—'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
