@@ -8,7 +8,7 @@ const calculateInitialWidth = (canvas) => {
 
  
   const scaleFactor = Math.min(canvas.width / (isMobile ? 400 : 1200), 1.3);
-  const scaledWidth = baseWidth * scaleFactor * 0.9;
+  const scaledWidth = baseWidth * scaleFactor;
 
   // Ensure width doesn't exceed game boundaries
   const maxWidth = isMobile
