@@ -5,7 +5,7 @@ const getBaseUrl = () => {
     return 'http://localhost:5000';
   }
   // In production, use the deployed backend URL from environment variable
-  return import.meta.env.VITE_BACKEND_URL || 'https://jpcs-booth-game-backend.onrender.com';
+  return import.meta.env.VITE_BACKEND_URL || 'https://talamakiling-server.onrender.com';
 };
 
 const baseUrl = getBaseUrl();
