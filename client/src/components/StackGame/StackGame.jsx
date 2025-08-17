@@ -9,6 +9,7 @@ import {
   newBox,
   handleBlockLanding,
   restartGame,
+  updateResponsiveDimensions,
 } from "./gameUtils";
 import {
   drawCartoonWoodBlock,
@@ -27,7 +28,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const [bonusPoints, setBonusPoints] = useState(0);
   const gameStateRef = useRef(null);
   const audioRef = useRef(null);
- /*  const gameAudioRef = useRef(null); */
+/*   const gameAudioRef = useRef(null); */
   const bonusPointsRef = useRef(0);
 
   const vibrateOnDrop = () => {
@@ -38,7 +39,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
  /*  useEffect(() => {
     gameAudioRef.current = new Audio(bgSound);
-    gameAudioRef.current.volume = 0.02;
+    gameAudioRef.current.volume = 0.1;
     gameAudioRef.current.loop = true;
 
     const playAudio = async () => {
@@ -52,14 +53,12 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     playAudio();
 
     return () => {
-    
       if (gameAudioRef.current) {
         gameAudioRef.current.pause();
         gameAudioRef.current = null;
       }
     };
   }, []); */
-
 
   useEffect(() => {
     audioRef.current = new Audio(block);
@@ -81,7 +80,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
       context.font = 'bold 30px "Cosmic sans", cursive, sans-serif';
 
-      gameStateRef.current = initGameState(isMobile);
+      // Pass canvas to initGameState for responsive width calculation
+      gameStateRef.current = initGameState(isMobile, canvas);
       gameStateRef.current.canvas = canvas;
       gameStateRef.current.context = context;
 
@@ -108,14 +108,18 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       canvas.height = window.innerHeight;
 
       if (gameStateRef.current?.boxes.length > 0) {
-        const initialX = isMobile
+        // Update responsive dimensions when canvas resizes
+        updateResponsiveDimensions(gameStateRef.current);
+
+        const initialX = gameStateRef.current.isMobile
           ? canvas.width / 2 - gameStateRef.current.initialWidth / 2
           : Math.max(
               canvas.width / 2 - gameStateRef.current.initialWidth / 2,
               (canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
             );
+
         gameStateRef.current.boxes[0].x = initialX;
-        gameStateRef.current.boxes[0].width = gameStateRef.current.initialWidth;
+        // Width is now updated by updateResponsiveDimensions
       }
     };
 
