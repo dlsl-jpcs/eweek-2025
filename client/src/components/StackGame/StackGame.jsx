@@ -38,7 +38,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
   useEffect(() => {
     gameAudioRef.current = new Audio(bgSound);
-    gameAudioRef.current.volume = 0.1;
+    gameAudioRef.current.volume = 0.02;
     gameAudioRef.current.loop = true;
 
     const playAudio = async () => {
