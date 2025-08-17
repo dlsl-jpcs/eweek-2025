@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import block from "/block2.mp3";
-import bgSound from "/gameplay.mp3";
+/* import bgSound from "/gameplay.mp3"; */
 import { GAME_CONSTANTS } from "./constants";
 import {
   initGameState,
@@ -27,7 +27,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const [bonusPoints, setBonusPoints] = useState(0);
   const gameStateRef = useRef(null);
   const audioRef = useRef(null);
-  const gameAudioRef = useRef(null);
+ /*  const gameAudioRef = useRef(null); */
   const bonusPointsRef = useRef(0);
 
   const vibrateOnDrop = () => {
@@ -36,7 +36,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
     }
   };
 
-  useEffect(() => {
+ /*  useEffect(() => {
     gameAudioRef.current = new Audio(bgSound);
     gameAudioRef.current.volume = 0.02;
     gameAudioRef.current.loop = true;
@@ -58,7 +58,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         gameAudioRef.current = null;
       }
     };
-  }, []);
+  }, []); */
 
 
   useEffect(() => {
