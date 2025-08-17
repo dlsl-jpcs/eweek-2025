@@ -1,6 +1,7 @@
 // Configuration for different environments
 const getBaseUrl = () => {
   if (import.meta.env.DEV) {
+    // Make sure this matches your server's port (default is 5000)
     return 'http://localhost:5000';
   }
   // In production, use the deployed backend URL from environment variable

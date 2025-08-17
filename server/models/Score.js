@@ -29,7 +29,6 @@ const scoreSchema = new mongoose.Schema({
   }
 });
 
-// Compound index to ensure unique student per session
 scoreSchema.index({ studentId: 1, sessionId: 1 });
 
 module.exports = mongoose.model('Score', scoreSchema);

@@ -14,7 +14,6 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
     }
   }, [leaderboard, playerName, score]);
 
-  // Note: onPlayAgain function is kept for future use but not displayed
   const canPlayAgain = attempts < maxAttempts;
 
   return (
@@ -51,7 +50,6 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
               </p>
             </motion.div>
 
-            {/* Session Complete Message */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -59,12 +57,13 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
               className="mt-4 p-4 bg-[#f0f9ff] border-2 border-[#0ea5e9] rounded-xl"
             >
               <p className="text-[#0369a1] text-center font-medium">
-                Session Complete! Scan the QR code again to play more.
+                Session Complete! Scan the QR code again to play more. 
+                {/* ano ipapalit dito hwjhsaajassa shane ikaw na */}
               </p>
             </motion.div>
 
-            {/* Note: Retry functionality is disabled but code is preserved for future use */}
-            {/* 
+            {/* Note: Retry functionality is disabled but code is preserved for future use  NOTE: NI-ENABLE Q NA*/}
+            /* 
             {canPlayAgain && (
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
@@ -87,10 +86,11 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
                 <p className="text-[#dc2626] text-center font-medium">
                   You've used all {maxAttempts} attempts for this session. 
                   Scan the QR code again to play more!
+                  {/* palitan din toh */}
                 </p>
               </motion.div>
             )}
-            */}
+            */
           </div>
         </motion.div>
 

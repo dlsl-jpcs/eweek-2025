@@ -9,11 +9,11 @@ const cors = require('cors');
 const { fetchStudentInfo } = require('./portalClient');
 const { deriveUsername, deriveDisplayName } = require('./username');
 
-// CORS configuration for production deployment
+// CORS 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://jpcs-booth-game-frontend.onrender.com', 'http://localhost:3000']
-    : true,
+    : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -21,27 +21,19 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGO_URI, {
-  // MongoDB 4.0+ doesn't need these options
 })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
 app.use(express.json());
 
-// Simple game access control - no session management needed
-// The game is accessible via the deployed URL, but requires admin approval to play
+const pendingRequests = new Map(); 
 
-// Add this after the session management section in server/server.js
-
-// Manual approval system
-const pendingRequests = new Map(); // Track pending approval requests
-
-// Generate unique request ID
+// request id generator
 const generateRequestId = () => {
   return 'req_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
 
-// Submit approval request (when student enters ID)
 app.post('/api/approval/request', async (req, res) => {
   try {
     const { studentId, studentName } = req.body;
@@ -55,9 +47,9 @@ app.post('/api/approval/request', async (req, res) => {
     pendingRequests.set(requestId, {
       studentId,
       studentName,
-      status: 'pending', // pending, approved, rejected
+      status: 'pending',
       createdAt: Date.now(),
-      expiresAt: Date.now() + (5 * 60 * 1000) // 5 minutes to approve
+      expiresAt: Date.now() + (5 * 60 * 1000) 
     });
 
     console.log(`New approval request: ${studentName} (${studentId})`);
@@ -73,7 +65,7 @@ app.post('/api/approval/request', async (req, res) => {
   }
 });
 
-// Check approval status (polled by client)
+// check status
 app.get('/api/approval/status/:requestId', async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -83,7 +75,6 @@ app.get('/api/approval/status/:requestId', async (req, res) => {
       return res.status(404).json({ error: 'Request not found' });
     }
 
-    // Clean up expired requests
     if (Date.now() > request.expiresAt) {
       pendingRequests.delete(requestId);
       return res.status(410).json({ error: 'Request has expired' });
@@ -101,7 +92,7 @@ app.get('/api/approval/status/:requestId', async (req, res) => {
   }
 });
 
-// Approve request (admin action)
+// approve
 app.post('/api/approval/approve/:requestId', async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -132,7 +123,7 @@ app.post('/api/approval/approve/:requestId', async (req, res) => {
   }
 });
 
-// Reject request (admin action)
+// reject
 app.post('/api/approval/reject/:requestId', async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -164,7 +155,7 @@ app.post('/api/approval/reject/:requestId', async (req, res) => {
   }
 });
 
-// Get pending requests (admin dashboard)
+// pending
 app.get('/api/approval/pending', async (req, res) => {
   try {
     const { staffPassword } = req.query;
@@ -174,7 +165,6 @@ app.get('/api/approval/pending', async (req, res) => {
       return res.status(401).json({ error: 'Invalid booth password' });
     }
 
-    // Clean up expired requests
     cleanupExpiredRequests();
 
     const pending = Array.from(pendingRequests.entries())
@@ -196,7 +186,7 @@ app.get('/api/approval/pending', async (req, res) => {
   }
 });
 
-// Clean up expired requests
+// expire
 function cleanupExpiredRequests() {
   const now = Date.now();
   for (const [requestId, request] of pendingRequests.entries()) {
@@ -206,7 +196,7 @@ function cleanupExpiredRequests() {
   }
 }
 
-// DLSL Student Lookup API - Integrated into the game server
+// ito yung illegal
 app.post('/api/username', async (req, res) => {
   try {
     const { studentId, strategy } = req.body || {};
@@ -245,12 +235,11 @@ app.post('/api/scores', async (req, res) => {
       return res.status(400).json({ error: 'Student ID, name, score, and session ID are required.' });
     }
 
-    // Check if student already has a score in this session
     const existingScore = await Score.findOne({ studentId, sessionId });
     
     if (existingScore) {
       console.log('Updating existing score for student:', studentId);
-      // Update existing score if new score is higher
+      // UPDATE SCORE PAG MAS MATAAS NEW SCORE
       if (score > existingScore.score) {
         existingScore.score = score;
         existingScore.attempts += 1;
@@ -262,7 +251,7 @@ app.post('/api/scores', async (req, res) => {
           maxAttempts: 3
         });
       } else {
-        // Just increment attempts
+        // TRACK ILANG ATTEMPTS
         existingScore.attempts += 1;
         await existingScore.save();
         console.log('Attempt recorded, score not updated');
@@ -274,7 +263,7 @@ app.post('/api/scores', async (req, res) => {
       }
     } else {
       console.log('Creating new score entry for student:', studentId);
-      // Create new score entry
+      // NEW SCORE
       const newScore = new Score({ studentId, name, score, sessionId });
       await newScore.save();
       console.log('New score saved successfully:', score);
@@ -294,7 +283,7 @@ app.get('/api/leaderboard', async (req, res) => {
   try {
     console.log('Leaderboard request received');
     
-    // Get the best score for each student across all sessions
+    // BEST SCORE NG STUDENT, ISANG SCORE LANG PER STUDENT MARERECORD
     const topScores = await Score.aggregate([
       {
         $group: {
@@ -322,7 +311,7 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
-// Check if student can still play (attempts < 3)
+// IF -AALLOW NATIN SILA MAG-RETRY
 app.get('/api/student-status/:studentId/:sessionId', async (req, res) => {
   try {
     const { studentId, sessionId } = req.params;

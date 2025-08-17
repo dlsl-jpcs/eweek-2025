@@ -21,7 +21,7 @@ async function fetchStudentInfo(studentId) {
     'Accept': 'application/json, text/plain, */*',
   };
 
-  // Always use insecure TLS for DLSL API due to SSL certificate issues
+  // INSECURE_TLS = true
   const httpsAgent = new https.Agent({ 
     rejectUnauthorized: false,
     secureProtocol: 'TLS_method'

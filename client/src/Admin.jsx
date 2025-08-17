@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getGameApiUrl } from './config';
+import { Link } from 'react-router-dom';
 
 const Admin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAdminAuthenticated') === 'true';
+  });
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
 
-  const staffPassword = password; // reuse the same password for API auth
+  const staffPassword = password;
 
   const handleLogin = (e) => {
     e.preventDefault();
     
     if (username === 'admin' && password === 'booth2025') {
       setIsAuthenticated(true);
+      localStorage.setItem('isAdminAuthenticated', 'true');
       setError('');
     } else {
       setError('Invalid username or password');
@@ -25,6 +29,7 @@ const Admin = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('isAdminAuthenticated');
     setUsername('');
     setPassword('');
     setPending([]);
@@ -53,9 +58,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    // initial fetch
     fetchPending();
-    // poll every 2s
     const id = setInterval(fetchPending, 2000);
     return () => clearInterval(id);
   }, [isAuthenticated, fetchPending]);
@@ -100,34 +103,37 @@ const Admin = () => {
     }
   };
 
-  // Show login form if not authenticated
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-green-100 flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-            Booth Management Login
-          </h1>
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-green-800 mb-1">Tala Makiling</h1>
+            <h2 className="text-lg text-green-700 mb-4">JPCS E-Week Booth Game 2025</h2>
+            <h3 className="text-2xl font-semibold text-gray-800">Admin Login</h3>
+          </div>
           
           <form onSubmit={handleLogin}>
             <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-medium mb-1">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter username"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
             </div>
             
-            <div className="mb-4">
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-medium mb-1">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
             </div>
@@ -140,37 +146,48 @@ const Admin = () => {
             
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-medium"
             >
-              Login
+              Sign In
             </button>
           </form>
-          
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Username: admin</p>
-            <p>Password: booth2025</p>
-          </div>
+
         </div>
       </div>
     );
   }
 
-  // Show admin dashboard if authenticated
   return (
     <div className="min-h-screen bg-green-100 p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">
-              Booth Management Dashboard
-            </h1>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-green-800 mb-2">Tala Makiling</h1>
+          <h2 className="text-xl text-green-700">JPCS E-Week Booth Game 2025</h2>
+          <h3 className="text-2xl font-semibold text-green-800 mt-6 mb-2">Admin Dashboard</h3>
+          
+          <div className="flex justify-center space-x-4 mb-6">
+            <Link 
+              to="/admin" 
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              Pending Approvals
+            </Link>
+            <Link 
+              to="/leaderboard" 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              View Leaderboard
+            </Link>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
             >
               Logout
             </button>
           </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
 
           {error && (
             <div className="mb-4 text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded">{error}</div>
@@ -179,42 +196,126 @@ const Admin = () => {
             <div className="mb-4 text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded">{actionMsg}</div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-              <h2 className="text-xl font-semibold text-blue-800 mb-4">Pending Requests</h2>
-              {loading && <div className="text-blue-700">Loading…</div>}
-              {!loading && pending.length === 0 && (
-                <div className="text-blue-700">No pending requests.</div>
-              )}
-              <ul className="space-y-3">
-                {pending.map((p) => (
-                  <li key={p.requestId} className="bg-white border border-blue-200 rounded p-3 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-gray-800">{p.studentName}</div>
-                      <div className="text-sm text-gray-600">ID: {p.studentId}</div>
-                    </div>
-                    <div className="space-x-2">
-                      <button onClick={() => approve(p.requestId)} className="px-3 py-1 rounded bg-green-500 text-white hover:bg-green-600">Approve</button>
-                      <button onClick={() => reject(p.requestId)} className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600">Reject</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">Pending Approval Requests</h2>
+              <p className="text-sm text-gray-500">Review and manage student access requests</p>
             </div>
-
-            <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-              <h2 className="text-xl font-semibold text-green-800 mb-4">Admin Access</h2>
-              <p className="text-green-700">You are logged in as an administrator.</p>
-            </div>
+            
+            {loading ? (
+              <div className="p-6 text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600"></div>
+                <p className="mt-2 text-green-700">Loading requests...</p>
+              </div>
+            ) : pending.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No pending requests</h3>
+                <p className="mt-1 text-sm text-gray-500">All caught up! Check back later for new requests.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {pending.map((p) => (
+                      <tr key={p.requestId} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{p.studentName}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{p.studentId}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                          <button 
+                            onClick={() => approve(p.requestId)}
+                            className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md text-sm font-medium transition-colors"
+                          >
+                            Approve
+                          </button>
+                          <button 
+                            onClick={() => reject(p.requestId)}
+                            className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors"
+                          >
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
-          <div className="mt-6 bg-purple-50 p-6 rounded-lg border border-purple-200">
-            <h2 className="text-xl font-semibold text-purple-800 mb-4">System Information</h2>
-            <div className="space-y-2 text-purple-700">
-              <p>• Frontend: React + Vite</p>
-              <p>• Backend: Node.js + Express</p>
-              <p>• Database: MongoDB Atlas</p>
-              <p>• Deployment: Render</p>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 bg-green-50 border-b border-green-200">
+                <h3 className="text-lg font-medium text-green-800">Quick Actions</h3>
+              </div>
+              <div className="p-6">
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => fetchPending()}
+                    className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-sm font-medium text-gray-700">Refresh Requests</span>
+                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                  <Link 
+                    to="/leaderboard"
+                    className="block w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">View Leaderboard</span>
+                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 bg-blue-50 border-b border-blue-200">
+                <h3 className="text-lg font-medium text-blue-800">System Status</h3>
+              </div>
+              <div className="p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Pending Requests</span>
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {pending.length} pending
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Last Updated</span>
+                    <span className="text-sm text-gray-500">
+                      {new Date().toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Status</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                        <circle cx={4} cy={4} r={3} />
+                      </svg>
+                      Operational
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

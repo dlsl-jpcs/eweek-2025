@@ -1,10 +1,9 @@
-// client/src/components/ApprovalWaiting.jsx
 import React, { useState, useEffect } from 'react';
 import { getGameApiUrl } from '../config';
 
 const ApprovalWaiting = ({ requestId, studentName, onApproved, onRejected }) => {
   const [status, setStatus] = useState('pending');
-  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes
+  const [timeRemaining, setTimeRemaining] = useState(300);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -33,10 +32,10 @@ const ApprovalWaiting = ({ requestId, studentName, onApproved, onRejected }) => 
       }
     };
 
-    // Check status every 2 seconds
+    // every 2 seconds magrerefresh
     const interval = setInterval(checkStatus, 2000);
     
-    // Countdown timer
+    // timer
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
@@ -76,12 +75,10 @@ const ApprovalWaiting = ({ requestId, studentName, onApproved, onRejected }) => 
             </p>
           </div>
 
-          {/* Loading Animation */}
           <div className="mb-6">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#fca94c]"></div>
           </div>
 
-          {/* Timer */}
           <div className="mb-6 text-center">
             <p className="text-[#8b7355] text-sm mb-2">Time remaining:</p>
             <p className="text-[#4a3f2a] text-2xl font-bold">
@@ -89,14 +86,12 @@ const ApprovalWaiting = ({ requestId, studentName, onApproved, onRejected }) => 
             </p>
           </div>
 
-          {/* Instructions */}
           <div className="text-center">
             <p className="text-[#8b7355] text-sm">
               Make sure you've signed up at our booth before requesting approval.
             </p>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="mt-6 text-red-600 text-center px-4 py-2 bg-red-50 rounded-lg border border-red-200">
               {error}

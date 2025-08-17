@@ -13,7 +13,7 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
     setError("");
     
     try {
-      // Fetch student name from DLSL API
+      // FETCH
       const response = await fetch(getDlslApiUrl('/api/username'), {
         method: 'POST',
         headers: {
@@ -29,18 +29,14 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
 
       const data = await response.json();
       
-      // Use the display name from the API response
       const studentName = data.displayName || 'Unknown Student';
       
-      // Store both the name and student ID
       setPlayerName(studentName);
       setStudentId(inputValue.trim());
       
-      // Submit approval request instead of proceeding directly
       if (onApprovalRequest) {
         onApprovalRequest(inputValue.trim(), studentName);
       } else {
-        // Fallback to direct game access if approval system is not available
         setGameState("mechanics");
       }
       
@@ -66,6 +62,7 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
           </h1>
           <p className="text-[#6b5b47] text-lg mb-6 text-center">
             We'll fetch your name from the DLSL database
+            {/* palitan din siguro toh */}
           </p>
           
           <input

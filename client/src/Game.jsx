@@ -28,17 +28,13 @@ const Game = () => {
   const [sessionError, setSessionError] = useState("");
   const [requestId, setRequestId] = useState("");
 
-  // No session validation needed - game is accessible via deployed URL
   useEffect(() => {
-    // Generate a simple session ID for tracking game attempts
+    // session id generator
     const gameSessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
     setSessionId(gameSessionId);
     setGameState(GAME_STATES.STUDENT_ID_ENTRY);
   }, []);
 
-  // No need to generate new session ID since we use the QR session ID
-
-  // Check if student can still play when entering mechanics
   useEffect(() => {
     if (gameState === GAME_STATES.MECHANICS && studentId && sessionId) {
       checkStudentStatus();
@@ -53,7 +49,7 @@ const Game = () => {
         setAttempts(data.attempts);
         
         if (!data.canPlay) {
-          // Student has used all attempts, show results
+          // pag ubos na attempts
           setScore(data.bestScore || 0);
           setGameState(GAME_STATES.RESULTS);
         }
@@ -63,9 +59,9 @@ const Game = () => {
     }
   };
 
+  // post score, tapos update leaderboard tapos fetch updated lb
   const postScoreAndFetchLeaderboard = async () => {
     try {
-      // Post the player's score to the backend
       const response = await fetch(getGameApiUrl('/api/scores'), {
         method: "POST",
         headers: {
@@ -84,7 +80,6 @@ const Game = () => {
         setAttempts(data.attempts);
       }
 
-      // Then fetch the updated leaderboard
       fetchLeaderboard();
     } catch (error) {
       console.error("Error posting score or fetching leaderboard:", error);
@@ -109,7 +104,6 @@ const Game = () => {
     }
   };
 
-  // Handle game completion
   useEffect(() => {
     if (gameState === GAME_STATES.RESULTS) {
       postScoreAndFetchLeaderboard();
@@ -138,7 +132,6 @@ const Game = () => {
       }
     } catch (error) {
       console.error('Error submitting approval request:', error);
-      // Fall back to direct game access if approval system fails
       setPlayerName(studentName);
       setGameState(GAME_STATES.MECHANICS);
     }
@@ -158,7 +151,6 @@ const Game = () => {
       setScore(0);
       setGameState(GAME_STATES.STACK_GAME);
     } else {
-      // Reset everything and go back to student ID entry for new approval
       setPlayerName("");
       setStudentId("");
       setScore(0);
