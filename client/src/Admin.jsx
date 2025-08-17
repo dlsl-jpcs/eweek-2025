@@ -40,15 +40,25 @@ const Admin = () => {
   const fetchPending = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      if (isInitialLoad) {
+      const isFirstLoad = isInitialLoad;
+      if (isFirstLoad) {
         setLoading(true);
+      } else {
+        setActionMsg('Refreshing requests...');
       }
-      const url = getGameApiUrl(`/api/approval/pending?staffPassword=${encodeURIComponent(staffPassword || '')}`);
-      const res = await fetch(url);
+      
+      const url = getGameApiUrl('/api/approval/pending');
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ staffPassword: password })
+      });
+      
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Failed to load pending requests (${res.status})`);
       }
+      
       const data = await res.json();
       setPending(prevPending => {
         // Only update if we have new data
@@ -64,9 +74,17 @@ const Admin = () => {
       if (isInitialLoad) {
         setLoading(false);
         setIsInitialLoad(false);
+      } else {
+        setActionMsg('');
       }
     }
   }, [isAuthenticated, staffPassword]);
+
+  // Store the password in a ref to avoid dependency issues
+  const passwordRef = useRef(password);
+  useEffect(() => {
+    passwordRef.current = password;
+  }, [password]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -80,7 +98,7 @@ const Admin = () => {
     }, 2000);
     
     return () => clearInterval(id);
-  }, [isAuthenticated, fetchPending, isInitialLoad]);
+  }, [isAuthenticated, isInitialLoad]); // Remove fetchPending from dependencies
 
   const approve = async (requestId) => {
     try {
@@ -199,9 +217,27 @@ const Admin = () => {
           {error && (
             <div className="mb-4 text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded">{error}</div>
           )}
-          {actionMsg && (
-            <div className="mb-4 text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded">{actionMsg}</div>
-          )}
+          <div className="flex justify-between items-center mb-4">
+            {actionMsg && (
+              <div className="text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {actionMsg}
+              </div>
+            )}
+            <button 
+              onClick={fetchPending}
+              className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+              title="Refresh requests"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh
+            </button>
+          </div>
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">

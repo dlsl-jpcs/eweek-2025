@@ -156,9 +156,9 @@ app.post('/api/approval/reject/:requestId', async (req, res) => {
 });
 
 // pending
-app.get('/api/approval/pending', async (req, res) => {
+const handlePendingRequests = async (req, res) => {
   try {
-    const { staffPassword } = req.query;
+    const staffPassword = req.body.staffPassword || req.query.staffPassword;
     
     const validPassword = process.env.BOOTH_PASSWORD || 'booth2025';
     if (staffPassword !== validPassword) {
@@ -177,14 +177,17 @@ app.get('/api/approval/pending', async (req, res) => {
         expiresAt: request.expiresAt,
         timeRemaining: Math.max(0, request.expiresAt - Date.now())
       }))
-      .sort((a, b) => a.createdAt - b.createdAt); // Oldest first
+      .sort((a, b) => a.createdAt - b.createdAt);
 
     res.json(pending);
   } catch (error) {
-    console.error('Error fetching pending requests:', error);
-    res.status(500).json({ error: 'Failed to fetch pending requests' });
+    console.error('Error in pending requests:', error);
+    res.status(500).json({ error: 'Failed to process pending requests' });
   }
-});
+};
+
+app.get('/api/approval/pending', handlePendingRequests);
+app.post('/api/approval/pending', handlePendingRequests);
 
 // expire
 function cleanupExpiredRequests() {
