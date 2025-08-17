@@ -57,8 +57,7 @@ export const handleBlockLanding = (
   setBonusPoints,
   setShowPerfect,
   setPerfectTimeout,
-  bonusPointsRef,
-  
+  bonusPointsRef
 ) => {
   const { boxes, current } = gameState;
   const currentBox = boxes[current];
