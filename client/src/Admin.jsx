@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getGameApiUrl } from './config';
-import { Link } from 'react-router-dom';
 
 const Admin = () => {
   const [username, setUsername] = useState('');
@@ -10,9 +9,7 @@ const Admin = () => {
   });
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionMsg, setActionMsg] = useState('');
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  // Removed loading animations and intervals; keep UI static
 
   const staffPassword = password;
 
@@ -34,75 +31,37 @@ const Admin = () => {
     setUsername('');
     setPassword('');
     setPending([]);
-    setActionMsg('');
   };
 
   const fetchPending = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      const isFirstLoad = isInitialLoad;
-      if (isFirstLoad) {
-        setLoading(true);
-      } else {
-        setActionMsg('Refreshing requests...');
-      }
-      
       const url = getGameApiUrl('/api/approval/pending');
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ staffPassword: password })
+        body: JSON.stringify({ staffPassword })
       });
-      
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Failed to load pending requests (${res.status})`);
       }
-      
       const data = await res.json();
-      setPending(prevPending => {
-        // Only update if we have new data
-        if (JSON.stringify(prevPending) !== JSON.stringify(data)) {
-          return Array.isArray(data) ? data : [];
-        }
-        return prevPending;
-      });
+      setPending(Array.isArray(data) ? data : []);
       setError('');
     } catch (err) {
       setError(err.message || 'Unable to load pending requests');
-    } finally {
-      if (isInitialLoad) {
-        setLoading(false);
-        setIsInitialLoad(false);
-      } else {
-        setActionMsg('');
-      }
     }
   }, [isAuthenticated, staffPassword]);
 
-  // Store the password in a ref to avoid dependency issues
-  const passwordRef = useRef(password);
-  useEffect(() => {
-    passwordRef.current = password;
-  }, [password]);
-
   useEffect(() => {
     if (!isAuthenticated) return;
-    
-    // Initial fetch
+    // Initial fetch only. No auto-refresh to avoid UI flicker.
     fetchPending();
-    
-    // Set up refresh interval
-    const id = setInterval(() => {
-      fetchPending();
-    }, 2000);
-    
-    return () => clearInterval(id);
-  }, [isAuthenticated, isInitialLoad]); // Remove fetchPending from dependencies
+  }, [isAuthenticated, fetchPending]);
 
   const approve = async (requestId) => {
     try {
-      setActionMsg('Approving...');
       const res = await fetch(getGameApiUrl(`/api/approval/approve/${requestId}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,17 +71,14 @@ const Admin = () => {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Approve failed (${res.status})`);
       }
-      setActionMsg('Approved');
       fetchPending();
     } catch (err) {
-      setActionMsg('');
       setError(err.message || 'Approve failed');
     }
   };
 
   const reject = async (requestId) => {
     try {
-      setActionMsg('Rejecting...');
       const res = await fetch(getGameApiUrl(`/api/approval/reject/${requestId}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -132,10 +88,8 @@ const Admin = () => {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Reject failed (${res.status})`);
       }
-      setActionMsg('Rejected');
       fetchPending();
     } catch (err) {
-      setActionMsg('');
       setError(err.message || 'Reject failed');
     }
   };
@@ -217,19 +171,10 @@ const Admin = () => {
           {error && (
             <div className="mb-4 text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded">{error}</div>
           )}
-          <div className="flex justify-between items-center mb-4">
-            {actionMsg && (
-              <div className="text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {actionMsg}
-              </div>
-            )}
+          <div className="flex justify-end items-center mb-4">
             <button 
               onClick={fetchPending}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+              className="text-sm text-gray-700 hover:text-gray-900 flex items-center"
               title="Refresh requests"
             >
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -245,12 +190,7 @@ const Admin = () => {
               <p className="text-sm text-gray-500">Review and manage student access requests</p>
             </div>
             
-            {loading ? (
-              <div className="p-6 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600"></div>
-                <p className="mt-2 text-green-700">Loading requests...</p>
-              </div>
-            ) : pending.length === 0 ? (
+            {pending.length === 0 ? (
               <div className="p-6 text-center text-gray-500">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -307,7 +247,7 @@ const Admin = () => {
               <div className="p-6">
                 <div className="space-y-3">
                   <button 
-                    onClick={() => fetchPending()}
+                    onClick={fetchPending}
                     className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-sm font-medium text-gray-700">Refresh Requests</span>
@@ -315,17 +255,6 @@ const Admin = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </button>
-                  <Link 
-                    to="/leaderboard"
-                    className="block w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">View Leaderboard</span>
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                  </Link>
                 </div>
               </div>
             </div>
