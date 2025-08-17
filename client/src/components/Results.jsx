@@ -50,17 +50,8 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
               </p>
             </motion.div>
 
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="mt-4 p-4 bg-[#f0f9ff] border-2 border-[#0ea5e9] rounded-xl"
-            >
-            </motion.div>
-
-            {/* Note: Retry functionality is disabled but code is preserved for future use  NOTE: NI-ENABLE Q NA*/}
-            /* 
-            {canPlayAgain && (
+            {/* Attempts logic: show Retry on first attempt, register prompt after max attempts */}
+            {canPlayAgain ? (
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -68,25 +59,31 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
                 onClick={onPlayAgain}
                 className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-[#fca94c] to-[#fb743f] rounded-xl shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-150"
               >
-                Play Again
+                Retry (Attempt {attempts + 1} of {maxAttempts})
               </motion.button>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-4 p-4 bg-[#fef2f2] border-2 border-[#fca5a5] rounded-xl"
+                >
+                  <p className="text-[#dc2626] text-center font-medium">
+                    You've used all {maxAttempts} attempts for this session.
+                  </p>
+                </motion.div>
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  onClick={() => alert('Please register at our booth again to get more attempts.')} 
+                  className="mt-3 px-6 py-3 text-base font-bold text-white bg-[#ef4444] rounded-xl shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-150"
+                >
+                  Register at Booth to Play Again
+                </motion.button>
+              </>
             )}
-
-            {!canPlayAgain && (
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mt-4 p-4 bg-[#fef2f2] border-2 border-[#fca5a5] rounded-xl"
-              >
-                <p className="text-[#dc2626] text-center font-medium">
-                  You've used all {maxAttempts} attempts for this session. 
-                  Scan the QR code again to play more!
-                  {/* palitan din toh */}
-                </p>
-              </motion.div>
-            )}
-            */
           </div>
         </motion.div>
 

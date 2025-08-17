@@ -5,7 +5,7 @@ const Admin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAdminAuthenticated') === 'true';
+    return sessionStorage.getItem('isAdminAuthenticated') === 'true';
   });
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
@@ -19,7 +19,7 @@ const Admin = () => {
     
     if (username === 'admin' && password === 'booth2025') {
       setIsAuthenticated(true);
-      localStorage.setItem('isAdminAuthenticated', 'true');
+      sessionStorage.setItem('isAdminAuthenticated', 'true');
       setError('');
     } else {
       setError('Invalid username or password');
@@ -28,7 +28,7 @@ const Admin = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAdminAuthenticated');
+    sessionStorage.removeItem('isAdminAuthenticated');
     setUsername('');
     setPassword('');
     setPending([]);
