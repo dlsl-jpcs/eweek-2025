@@ -120,7 +120,7 @@ const Leaderboard = () => {
               )}
             </div>
 
-            {/* List for other players */}
+            {/* others */}
             {otherScores.length > 0 && (
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <h2 className="text-xl font-semibold p-4 border-b border-gray-200 text-gray-700">

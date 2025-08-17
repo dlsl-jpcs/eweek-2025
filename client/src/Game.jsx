@@ -24,7 +24,7 @@ const Game = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [sessionId, setSessionId] = useState("");
   const [attempts, setAttempts] = useState(0);
-  const [maxAttempts] = useState(2);
+  const [maxAttempts] = useState(2); //dito palitan attempts
   const [sessionError, setSessionError] = useState("");
   const [requestId, setRequestId] = useState("");
 
