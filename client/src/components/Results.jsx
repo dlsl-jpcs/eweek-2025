@@ -59,7 +59,7 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
                 onClick={onPlayAgain}
                 className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-[#fca94c] to-[#fb743f] rounded-xl shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-150"
               >
-                Retry (Attempt {attempts + 1} of {maxAttempts})
+                Retry (Attempt {attempts} of {maxAttempts})
               </motion.button>
             ) : (
               <>
