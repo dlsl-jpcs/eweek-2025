@@ -92,7 +92,7 @@ const Leaderboard = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <img src={mayaqt} alt="" className="hidden lg:block lg:absolute h-[420px] left-20 top-1"  />
+      {/* <img src={mayaqt} alt="" className="hidden lg:block lg:absolute h-[420px] left-20 top-1"  /> */}
       <div className="max-w-4xl mx-auto">
         <h1
           className="text-3xl font-bold text-center mb-8 text-brown-800"
