@@ -85,14 +85,14 @@ const Leaderboard = () => {
     <div
       className="relative min-h-screen p-4 md:p-8"
       style={{
-        backgroundColor: "#f5f0e6", // Cream background
+        backgroundColor: "#f5f0e6", 
         backgroundImage: `url(${bg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
     >
-      <img src={mayaqt} alt="" className="hidden md:absolute h-[420px] left-20 top-1" />
+      <img src={mayaqt} alt="" className="hidden lg:block lg:absolute h-[420px] left-20 top-1"  />
       <div className="max-w-4xl mx-auto">
         <h1
           className="text-3xl font-bold text-center mb-8 text-brown-800"
