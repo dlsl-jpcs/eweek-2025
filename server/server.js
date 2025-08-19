@@ -224,7 +224,7 @@ app.post('/api/username', async (req, res) => {
     });
   } catch (error) {
     console.error('Error in student lookup:', error);
-    res.status(500).json({ error: 'Failed to fetch student information from DLSL API' });
+    res.status(500).json({ error: 'Failed to fetch' });
   }
 });
 
