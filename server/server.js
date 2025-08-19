@@ -98,7 +98,7 @@ app.post('/api/approval/approve/:requestId', async (req, res) => {
     const { requestId } = req.params;
     const { staffPassword } = req.body;
     
-    const validPassword = process.env.BOOTH_PASSWORD || 'booth2025';
+    const validPassword = /* process.env.BOOTH_PASSWORD || */ 'booth2025pt2';
     if (staffPassword !== validPassword) {
       return res.status(401).json({ error: 'Invalid booth password' });
     }
@@ -129,7 +129,7 @@ app.post('/api/approval/reject/:requestId', async (req, res) => {
     const { requestId } = req.params;
     const { staffPassword, reason } = req.body;
     
-    const validPassword = process.env.BOOTH_PASSWORD || 'booth2025';
+    const validPassword = /* process.env.BOOTH_PASSWORD || */ 'booth2025pt2';
     if (staffPassword !== validPassword) {
       return res.status(401).json({ error: 'Invalid booth password' });
     }
@@ -160,7 +160,7 @@ const handlePendingRequests = async (req, res) => {
   try {
     const staffPassword = req.body.staffPassword || req.query.staffPassword;
     
-    const validPassword = process.env.BOOTH_PASSWORD || 'booth2025';
+    const validPassword = /* process.env.BOOTH_PASSWORD || */ 'booth2025pt2';
     if (staffPassword !== validPassword) {
       return res.status(401).json({ error: 'Invalid booth password' });
     }
