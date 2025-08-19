@@ -93,7 +93,7 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
             onClick={handleSubmit}
             disabled={isLoading || inputValue.trim() === ""}
           >
-            {isLoading ? "Fetching..." : "Continue"}
+            {isLoading ? "Loading..." : "Continue"}
           </button>
         </div>
       </div>
