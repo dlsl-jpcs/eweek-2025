@@ -17,7 +17,7 @@ const Admin = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     
-    if (username === 'admin' && password === 'booth2025') {
+    if (username === 'admin' && password === 'bukasnauli') {
       setIsAuthenticated(true);
       sessionStorage.setItem('isAdminAuthenticated', 'true');
       setError('');
