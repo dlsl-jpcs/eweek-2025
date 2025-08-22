@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import block from "/block2.mp3";
+/* import bgSound from "/gameplay.mp3"; */
 import { GAME_CONSTANTS } from "./constants";
 import {
   initGameState,
@@ -8,6 +9,7 @@ import {
   newBox,
   handleBlockLanding,
   restartGame,
+  updateResponsiveDimensions,
 } from "./gameUtils";
 import {
   drawCartoonWoodBlock,
@@ -26,23 +28,41 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
   const [bonusPoints, setBonusPoints] = useState(0);
   const gameStateRef = useRef(null);
   const audioRef = useRef(null);
+/*   const gameAudioRef = useRef(null); */
   const bonusPointsRef = useRef(0);
 
-
   const vibrateOnDrop = () => {
-    
     if ("vibrate" in navigator) {
-      
-      navigator.vibrate(60);
+      navigator.vibrate(200);
     }
   };
 
-  
+ /*  useEffect(() => {
+    gameAudioRef.current = new Audio(bgSound);
+    gameAudioRef.current.volume = 0.1;
+    gameAudioRef.current.loop = true;
+
+    const playAudio = async () => {
+      try {
+        await gameAudioRef.current.play();
+      } catch (err) {
+        console.log("Audio play failed:", err);
+      }
+    };
+
+    playAudio();
+
+    return () => {
+      if (gameAudioRef.current) {
+        gameAudioRef.current.pause();
+        gameAudioRef.current = null;
+      }
+    };
+  }, []); */
 
   useEffect(() => {
     audioRef.current = new Audio(block);
     audioRef.current.volume = 1;
-
 
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -60,7 +80,8 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
       context.font = 'bold 30px "Cosmic sans", cursive, sans-serif';
 
-      gameStateRef.current = initGameState(isMobile);
+      // Pass canvas to initGameState for responsive width calculation
+      gameStateRef.current = initGameState(isMobile, canvas);
       gameStateRef.current.canvas = canvas;
       gameStateRef.current.context = context;
 
@@ -87,14 +108,18 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       canvas.height = window.innerHeight;
 
       if (gameStateRef.current?.boxes.length > 0) {
-        const initialX = isMobile
+        // Update responsive dimensions when canvas resizes
+        updateResponsiveDimensions(gameStateRef.current);
+
+        const initialX = gameStateRef.current.isMobile
           ? canvas.width / 2 - gameStateRef.current.initialWidth / 2
           : Math.max(
               canvas.width / 2 - gameStateRef.current.initialWidth / 2,
               (canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
             );
+
         gameStateRef.current.boxes[0].x = initialX;
-        gameStateRef.current.boxes[0].width = gameStateRef.current.initialWidth;
+        // Width is now updated by updateResponsiveDimensions
       }
     };
 
@@ -124,14 +149,14 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
       }
       context.fillStyle = textColor;
 
-     context.font = isMobile
-       ? "bold 40px Comic Neue, sans-serif"
-       : "bold 30px Comic Neue, sans-serif";
+      context.font = isMobile
+        ? "bold 40px Comic Neue, sans-serif"
+        : "bold 30px Comic Neue, sans-serif";
 
       context.fillText(
         (stackHeight + bonusPointsRef.current).toString(),
         canvas.width / 2,
-        isMobile ? 150 : canvas.height / 6
+        isMobile ? 120 : canvas.height / 6
       );
       context.textAlign = "left";
 
@@ -168,9 +193,6 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
       if (gameState.mode === "gameOver") {
         if (Date.now() - gameState.gameOverTime > 100) {
-          
-      
-
           setScore(gameState.current - 1 + bonusPointsRef.current);
           setGameState("results");
         }
@@ -217,15 +239,14 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
 
           audioRef.current.currentTime = 0;
           audioRef.current.play();
-           vibrateOnDrop();
+          vibrateOnDrop();
 
           handleBlockLanding(
             gameState,
             setBonusPoints,
             setShowPerfect,
             setPerfectTimeout,
-            bonusPointsRef,
-       
+            bonusPointsRef
           );
         }
       }
@@ -277,7 +298,7 @@ const StackGame = ({ name, score, setScore, setGameState }) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
-   
+
       if (perfectTimeout) {
         clearTimeout(perfectTimeout);
       }

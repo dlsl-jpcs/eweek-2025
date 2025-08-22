@@ -1,25 +1,16 @@
 import React, { useState } from "react";
-import bg from "../assets/bg.jpg"
 
-const NameInput = ({ playerName, setPlayerName, setGameState }) => {
+const NameInput = ({playerName, setPlayerName, setGameState}) => {
   const [inputValue, setInputValue] = useState(playerName);
 
   const handleStart = () => {
     if (inputValue.trim() === "") return;
     setPlayerName(inputValue.trim());
-    setGameState("mechanics");
-  };
+    setGameState("mechanics"); 
+  }
 
   return (
-    <div
-      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4"
-      style={{
-        backgroundImage: `url(${bg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4">
       <div className="w-full max-w-lg bg-gradient-to-br from-[#ffe8d6] to-[#fcd5ce] border-[6px] border-[#855c42] rounded-[3rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] overflow-hidden">
         <div className="flex flex-col items-center justify-center w-full h-full rounded-[2.5rem] bg-[#fffef6] p-10 border-4 border-[#b08968] shadow-inner">
           <h1 className="text-[#4a3f2a] text-4xl font-bold mb-6 text-center drop-shadow-sm">

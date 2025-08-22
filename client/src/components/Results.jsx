@@ -3,56 +3,44 @@ import { useEffect, useState, useRef } from "react";
 import bg from "../assets/bg.jpg";
 import over from "/gameover.mp3";
 
-export const Result = ({ playerName, score }) => {
-  const [leaderboard, setLeaderboard] = useState([]);
+export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, onPlayAgain }) => {
   const [playerRank, setPlayerRank] = useState(null);
   const hasPostedScore = useRef(false);
-   const audioRef = useRef(null);
+  const audioRef = useRef(null);
+  
 
   useEffect(() => {
-     audioRef.current = new Audio(over);
+    audioRef.current = new Audio(over);
 
-     // Try to play audio
-     const playAudio = async () => {
-       try {
-         await audioRef.current.play();
-       } catch (err) {
-         console.log("Audio play failed:", err);
-       }
-     };
+    const playAudio = async () => {
+      try {
+        await audioRef.current.play();
+      } catch (err) {
+        console.log("Audio play failed:", err);
+      }
+    };
 
-     playAudio();
+    playAudio();
 
-    if (playerName && typeof score === "number" && !hasPostedScore.current) {
-      hasPostedScore.current = true;
-      fetch("http://localhost:5000/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: playerName, score }),
-      }).catch((err) => {
-        console.error("Failed to save score:", err);
-      });
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+
+    if (leaderboard && playerName && typeof score === "number") {
+      const rank = leaderboard.findIndex(
+        (entry) => entry.name === playerName && entry.bestScore === score
+      );
+      setPlayerRank(rank !== -1 ? rank + 1 : null);
     }
+  }, [leaderboard, playerName, score]);
 
-    fetch("http://localhost:5000/api/leaderboard")
-      .then((res) => res.json())
-      .then((data) => {
-        setLeaderboard(data);
-        const rank = data.findIndex(
-          (entry) => entry.name === playerName && entry.score === score
-        );
-        setPlayerRank(rank !== -1 ? rank + 1 : null);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch leaderboard:", err);
-      });
-  return () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
-  }, [playerName, score]);
+  const canPlayAgain = attempts < maxAttempts;
 
   return (
     <div
@@ -88,8 +76,7 @@ export const Result = ({ playerName, score }) => {
               className="bg-[#fffef6] border-2 border-[#b08968] rounded-full px-6 py-3 lg:px-5 lg:py-2 shadow-inner"
             >
               <p className="text-2xl lg:text-xl font-bold text-[#5a4a3a]">
-                Your Score:{" "}
-                <span className="text-[#fb743f] font-sora">{score}</span>
+                Your Score: <span className="text-[#fb743f]">{score}</span>
                 {/* rank */}
                 {playerRank && (
                   <span className="ml-4 text-[#b08968] text-lg">
@@ -98,6 +85,45 @@ export const Result = ({ playerName, score }) => {
                 )}
               </p>
             </motion.div>
+
+            {/* Attempts logic: show Retry on first attempt, register prompt after max attempts */}
+            {canPlayAgain ? (
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                onClick={onPlayAgain}
+                className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-[#fca94c] to-[#fb743f] rounded-xl shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-150"
+              >
+                Retry (Attempt {attempts} of {maxAttempts})
+              </motion.button>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-4 p-4 bg-[#fef2f2] border-2 border-[#fca5a5] rounded-xl"
+                >
+                  <p className="text-[#dc2626] text-center font-medium">
+                    You've used all {maxAttempts} attempts for this session.
+                  </p>
+                </motion.div>
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  onClick={() =>
+                    alert(
+                      "Please register at our booth again to get more attempts."
+                    )
+                  }
+                  className="mt-3 px-6 py-3 text-base font-bold text-white bg-[#ef4444] rounded-xl shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-150"
+                >
+                  Register at Booth to Play Again
+                </motion.button>
+              </>
+            )}
           </div>
         </motion.div>
 
@@ -120,7 +146,9 @@ export const Result = ({ playerName, score }) => {
             <div className="w-full space-y-2">
               {leaderboard.map((player, index) => (
                 <motion.div
-                  key={player._id || `${player.name}-${player.score}-${index}`}
+                  key={
+                    player._id || `${player.name}-${player.bestScore}-${index}`
+                  }
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
@@ -153,7 +181,7 @@ export const Result = ({ playerName, score }) => {
                     </span>
                   </div>
                   <span
-                    className={`text-lg lg:text-base font-bold font-sora ${
+                    className={`text-lg lg:text-base font-bold ${
                       index === 0
                         ? "text-[#fb743f]"
                         : index === 1
@@ -163,7 +191,7 @@ export const Result = ({ playerName, score }) => {
                         : "text-[#5a4a3a]"
                     }`}
                   >
-                    {player.score}
+                    {player.bestScore}
                   </span>
                 </motion.div>
               ))}
@@ -179,6 +207,7 @@ export const Result = ({ playerName, score }) => {
                 <div className="flex items-center">
                   <div className="rounded-full w-7 h-7 lg:w-6 lg:h-6 bg-[#fb743f] text-white flex items-center justify-center mr-3">
                     <span className="font-bold text-sm">
+                      {" "}
                       {playerRank || "?"}
                     </span>
                   </div>
@@ -186,7 +215,7 @@ export const Result = ({ playerName, score }) => {
                     {playerName}
                   </span>
                 </div>
-                <span className="text-lg lg:text-base font-bold font-sora text-[#fb743f]">
+                <span className="text-lg lg:text-base font-bold text-[#fb743f]">
                   {score}
                 </span>
               </div>

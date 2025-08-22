@@ -1,6 +1,30 @@
 import { GAME_CONSTANTS } from "./constants";
 
-export const initGameState = (isMobile) => {
+const calculateInitialWidth = (canvas) => {
+  const isMobile = canvas.width <= 768;
+  const baseWidth = isMobile
+    ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE
+    : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP;
+
+ 
+  const scaleFactor = Math.min(canvas.width / (isMobile ? 400 : 1200), 1.3);
+  const scaledWidth = baseWidth * scaleFactor;
+
+  // Ensure width doesn't exceed game boundaries
+  const maxWidth = isMobile
+    ? canvas.width * 0.7
+    : Math.min(GAME_CONSTANTS.MAX_GAME_WIDTH * 0.55, canvas.width * 0.35);
+
+  return Math.min(scaledWidth, maxWidth); 
+};
+
+export const initGameState = (isMobile, canvas = null) => {
+  const initialWidth = canvas
+    ? calculateInitialWidth(canvas)
+    : isMobile
+    ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE
+    : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP;
+
   return {
     mode: "bounce",
     canvas: null,
@@ -15,9 +39,7 @@ export const initGameState = (isMobile) => {
     boxes: [],
     debris: { x: 0, width: 0, y: 0 },
     isMobile,
-    initialWidth: isMobile
-      ? GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_MOBILE
-      : GAME_CONSTANTS.INITIAL_BLOCK_WIDTH_DESKTOP,
+    initialWidth,
   };
 };
 
@@ -57,8 +79,7 @@ export const handleBlockLanding = (
   setBonusPoints,
   setShowPerfect,
   setPerfectTimeout,
-  bonusPointsRef,
-  
+  bonusPointsRef
 ) => {
   const { boxes, current } = gameState;
   const currentBox = boxes[current];
@@ -127,6 +148,31 @@ export const handleBlockLanding = (
   newBox(gameState);
 };
 
+
+export const updateResponsiveDimensions = (gameState) => {
+  const { canvas } = gameState;
+  const newIsMobile = canvas.width <= 768;
+
+
+  gameState.isMobile = newIsMobile;
+
+
+  const newInitialWidth = calculateInitialWidth(canvas);
+  gameState.initialWidth = newInitialWidth;
+
+
+  if (gameState.boxes.length > 0 && gameState.current === 1) {
+    gameState.boxes[0].width = newInitialWidth;
+  }
+
+
+  const speedMultiplier = 1 + (gameState.current - 1) * 0.08;
+  gameState.xSpeed =
+    (newIsMobile
+      ? GAME_CONSTANTS.BASE_SPEED_MOBILE
+      : GAME_CONSTANTS.BASE_SPEED_DESKTOP) * speedMultiplier;
+};
+
 export const restartGame = (gameState) => {
   gameState.boxes.length = 1;
   gameState.mode = "bounce";
@@ -140,16 +186,20 @@ export const restartGame = (gameState) => {
   gameState.gameOverTime = 0;
   gameState.bonusPoints = 0;
 
+
+  const responsiveInitialWidth = calculateInitialWidth(gameState.canvas);
+  gameState.initialWidth = responsiveInitialWidth;
+
   const initialX = gameState.isMobile
-    ? gameState.canvas.width / 2 - gameState.initialWidth / 2
+    ? gameState.canvas.width / 2 - responsiveInitialWidth / 2
     : Math.max(
-        gameState.canvas.width / 2 - gameState.initialWidth / 2,
+        gameState.canvas.width / 2 - responsiveInitialWidth / 2,
         (gameState.canvas.width - GAME_CONSTANTS.MAX_GAME_WIDTH) / 2
       );
 
   gameState.boxes[0] = {
     x: initialX,
-    width: gameState.initialWidth,
+    width: responsiveInitialWidth,
     y: 0,
   };
 
