@@ -35,12 +35,14 @@ const StudentIdInput = ({ setPlayerName, setGameState, setStudentId, onApprovalR
       
       setPlayerName(studentName);
       setStudentId(inputValue.trim());
-      
-      if (onApprovalRequest) {
+      // remove approval
+      /* if (onApprovalRequest) {
         onApprovalRequest(inputValue.trim(), studentName);
       } else {
         setGameState("mechanics");
-      }
+      } */
+
+      setGameState("mechanics");
       
     } catch (err) {
       setError(err.message || 'An error occurred while fetching student information');
