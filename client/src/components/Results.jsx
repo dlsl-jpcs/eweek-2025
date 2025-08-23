@@ -86,8 +86,18 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
               </p>
             </motion.div>
 
+            <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                onClick={onPlayAgain}
+                className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-[#fca94c] to-[#fb743f] rounded-xl shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-150"
+              >
+                Retry
+              </motion.button>
+
             {/* Attempts logic: show Retry on first attempt, register prompt after max attempts */}
-            {canPlayAgain ? (
+           {/*  {canPlayAgain ? (
               <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -123,7 +133,7 @@ export const Result = ({ playerName, score, leaderboard, attempts, maxAttempts, 
                   Register at Booth to Play Again
                 </motion.button>
               </>
-            )}
+            )} */}
           </div>
         </motion.div>
 
