@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const scoreSchema = new mongoose.Schema({
   studentId: {
     type: String,
-    required: true,
+    // Make studentId optional to allow name-only registration
+    required: false,
     trim: true
   },
   name: {

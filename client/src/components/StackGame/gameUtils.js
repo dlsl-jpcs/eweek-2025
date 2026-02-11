@@ -67,7 +67,8 @@ export const newBox = (gameState) => {
     width: boxes[current - 1].width,
   };
 
-  const speedMultiplier = 1 + (current - 1) * 0.08;
+  // Slightly slower acceleration as stack grows
+  const speedMultiplier = 1 + (current - 1) * 0.04;
   gameState.xSpeed =
     (gameState.isMobile
       ? GAME_CONSTANTS.BASE_SPEED_MOBILE

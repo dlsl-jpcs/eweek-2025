@@ -231,21 +231,28 @@ app.post('/api/username', async (req, res) => {
 app.post('/api/scores', async (req, res) => {
   try {
     const { studentId, name, score, sessionId } = req.body;
-    
+
     console.log('Score submission received:', { studentId, name, score, sessionId });
-    
-    if (!studentId || !name || typeof score !== 'number' || !sessionId) {
-      return res.status(400).json({ error: 'Student ID, name, score, and session ID are required.' });
+
+    // Accept name-only submissions. studentId is optional.
+    if (!name || typeof score !== 'number' || !sessionId) {
+      return res.status(400).json({ error: 'Name, score, and session ID are required.' });
     }
 
-    const existingScore = await Score.findOne({ studentId, sessionId });
-    
+    // Try to find existing score by studentId (if provided) else by name+session
+    let existingScore = null;
+    if (studentId) {
+      existingScore = await Score.findOne({ studentId, sessionId });
+    }
+    if (!existingScore) {
+      existingScore = await Score.findOne({ name, sessionId });
+    }
+
     if (existingScore) {
-      console.log('Updating existing score for student:', studentId);
-      // UPDATE SCORE PAG MAS MATAAS NEW SCORE
+      console.log('Updating existing score for player:', existingScore._id || name);
       if (score > existingScore.score) {
         existingScore.score = score;
-        existingScore.attempts += 1;
+        existingScore.attempts = (existingScore.attempts || 0) + 1;
         await existingScore.save();
         console.log('Score updated successfully:', score);
         return res.json({ 
@@ -254,8 +261,7 @@ app.post('/api/scores', async (req, res) => {
           maxAttempts: 3
         });
       } else {
-        // TRACK ILANG ATTEMPTS
-        existingScore.attempts += 1;
+        existingScore.attempts = (existingScore.attempts || 0) + 1;
         await existingScore.save();
         console.log('Attempt recorded, score not updated');
         return res.json({ 
@@ -265,9 +271,8 @@ app.post('/api/scores', async (req, res) => {
         });
       }
     } else {
-      console.log('Creating new score entry for student:', studentId);
-      // NEW SCORE
-      const newScore = new Score({ studentId, name, score, sessionId });
+      console.log('Creating new score entry for player:', name);
+      const newScore = new Score({ studentId: studentId || undefined, name, score, sessionId });
       await newScore.save();
       console.log('New score saved successfully:', score);
       return res.status(201).json({ 
@@ -318,18 +323,22 @@ app.get('/api/leaderboard', async (req, res) => {
 app.get('/api/student-status/:studentId/:sessionId', async (req, res) => {
   try {
     const { studentId, sessionId } = req.params;
-    
-    const studentScore = await Score.findOne({ studentId, sessionId });
-    
+
+    // Attempt to find by studentId; if not found, treat the param as a player name.
+    let studentScore = await Score.findOne({ studentId, sessionId });
+    if (!studentScore) {
+      studentScore = await Score.findOne({ name: studentId, sessionId });
+    }
+
     if (!studentScore) {
       return res.json({ canPlay: true, attempts: 0, maxAttempts: 3 });
     }
-    
-    const canPlay = studentScore.attempts < 3;
-    
+
+    const canPlay = (studentScore.attempts || 0) < 3;
+
     res.json({
       canPlay,
-      attempts: studentScore.attempts,
+      attempts: studentScore.attempts || 0,
       maxAttempts: 3,
       bestScore: studentScore.score
     });

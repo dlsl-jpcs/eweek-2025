@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavig
 import { useEffect } from 'react';
 import Game from './Game';
 import Admin from './Admin';
-import Leaderboard from './components/Leaderboard';
+// Leaderboard route/UI is hidden for name-only flow. Kept in source for future use.
+// import Leaderboard from './components/Leaderboard';
 import "./index.css";
 
 function DebugOverlay() {
@@ -46,9 +47,11 @@ function App() {
             <Admin /> : 
             <Admin />
         } />
+        {/* Leaderboard route disabled — UI hidden per name-only registration change.
         <Route path="/leaderboard" element={
           <Leaderboard isAdmin={localStorage.getItem('isAdminAuthenticated') === 'true'} />
         } />
+        */}
         <Route path="/" element={
           <div className='bg-green-200 w-full h-[100dvh]'>
             <Game />

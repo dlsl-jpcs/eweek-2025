@@ -198,6 +198,7 @@ const Admin = () => {
               <p className="text-sm text-gray-500">Review and manage student access requests</p>
             </div>
             
+            {/* Approval flow UI disabled — commented out for name-only registration.
             {pending.length === 0 ? (
               <div className="p-6 text-center text-gray-500">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,6 +246,12 @@ const Admin = () => {
                 </table>
               </div>
             )}
+            */}
+
+            <div className="p-6 text-center text-gray-600">
+              <h3 className="text-lg font-medium">Approval flow disabled</h3>
+              <p className="text-sm text-gray-500">Manual approvals are currently disabled for name-only registration.</p>
+            </div>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">

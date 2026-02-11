@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import bg from "../assets/bg.jpg";
+import { motion } from "framer-motion";
+
+import logo from "/logo2.png";
 
 const NameInput = ({playerName, setPlayerName, setGameState}) => {
   const [inputValue, setInputValue] = useState(playerName);
@@ -10,7 +14,16 @@ const NameInput = ({playerName, setPlayerName, setGameState}) => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4">
+    <div
+          className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-[#d8f3dc] via-[#b7e4c7] to-[#95d5b2] p-4"
+          style={{
+            backgroundImage: `url(${bg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <img src={logo} alt="" className="w-[275px] lg:w-[325px]" />
       <div className="w-full max-w-lg bg-gradient-to-br from-[#ffe8d6] to-[#fcd5ce] border-[6px] border-[#855c42] rounded-[3rem] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)] overflow-hidden">
         <div className="flex flex-col items-center justify-center w-full h-full rounded-[2.5rem] bg-[#fffef6] p-10 border-4 border-[#b08968] shadow-inner">
           <h1 className="text-[#4a3f2a] text-4xl font-bold mb-6 text-center drop-shadow-sm">
@@ -23,7 +36,7 @@ const NameInput = ({playerName, setPlayerName, setGameState}) => {
             className="w-full max-w-[260px] px-5 py-3 mb-6 text-2xl rounded-2xl border-2 border-[#c4a484] focus:outline-none focus:ring-2 focus:ring-[#7a5e42] text-[#4a3f2a] font-medium text-center bg-[#f9f6f0] placeholder-[#9f7e63] shadow-sm"
             placeholder="Name"
           />
-          <button
+          <motion.button
             whileHover={{
               scale: 1.05,
               boxShadow: "0 5px 15px rgba(251, 116, 63, 0.4)",
@@ -32,7 +45,7 @@ const NameInput = ({playerName, setPlayerName, setGameState}) => {
             onClick={handleStart}
           >
             Start
-          </button>
+          </motion.button>
         </div>
       </div>
     </div>

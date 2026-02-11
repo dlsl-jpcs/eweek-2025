@@ -9,7 +9,9 @@ export const GAME_CONSTANTS = {
 
   MAX_GAME_WIDTH: 650,
   BASE_SPEED_MOBILE: 3.25,
-  BASE_SPEED_DESKTOP: 5,
+  // Reduced base speeds to slow horizontal log movement
+  BASE_SPEED_MOBILE: 1.6,
+  BASE_SPEED_DESKTOP: 2.5,
   INITIAL_BLOCK_WIDTH_MOBILE: 250,
   INITIAL_BLOCK_WIDTH_DESKTOP: 280,
 
